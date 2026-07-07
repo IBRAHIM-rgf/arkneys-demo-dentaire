@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Centre de commande — Cabinet dentaire du Léman · Démo Arkneys</title>
+<style>
+:root{--bg:#0a0f16;--bg2:#0d141e;--card:#101825;--chip:#16202e;--border:rgba(125,211,252,.14);
+--teal:#2dd4bf;--teal-d:#14b8a6;--text:#e7eef7;--mid:rgba(231,238,247,.75);--dim:rgba(231,238,247,.45);
+--red:#f87171;--amber:#fbbf24;--green:#4ade80;--orange:#ed8030}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;font-size:14px}
+.demo-note{position:fixed;top:10px;right:10px;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#06222b;background:#a5f3fc;font-weight:800;padding:5px 10px;border-radius:999px;z-index:50;opacity:.92}
+.app{max-width:1150px;margin:0 auto;background:var(--bg2);min-height:100vh;border-left:1px solid var(--border);border-right:1px solid var(--border);display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:13px;padding:15px 20px;border-bottom:1px solid var(--border)}
+.htile{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,#2dd4bf,#0e7490);display:flex;align-items:center;justify-content:center;font-size:22px;flex:none}
+.hinfo .nm{font-weight:800;font-size:16px}
+.hinfo .st{font-size:11.5px;color:var(--teal);font-weight:600;margin-top:1px}
+.hinfo .lg{font-size:10.5px;color:var(--dim);margin-top:1px;letter-spacing:.04em}
+.hr{margin-left:auto;display:flex;align-items:center;gap:10px}
+.status{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--mid);background:var(--chip);border:1px solid var(--border);border-radius:999px;padding:7px 13px;font-weight:600}
+.pulse{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pu 1.6s infinite}
+.pulse.off{background:var(--amber);animation:none}
+@keyframes pu{0%,100%{opacity:1}50%{opacity:.35}}
+.master{border:1px solid rgba(248,113,113,.4);background:rgba(248,113,113,.1);color:var(--red);border-radius:999px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s}
+.master.paused{border-color:rgba(74,222,128,.4);background:rgba(74,222,128,.1);color:var(--green)}
+a.dashlink{font-size:12px;font-weight:700;color:var(--teal);text-decoration:none;border:1px solid var(--border);background:var(--chip);border-radius:999px;padding:8px 14px}
+
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px 20px 4px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:12px 14px}
+.kpi .t{font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.07em;font-weight:700}
+.kpi .n{font-size:26px;font-weight:800;margin-top:3px}
+.kpi .n small{font-size:11px;color:var(--teal);font-weight:700;margin-left:6px}
+
+.grid{display:grid;grid-template-columns:1.45fr 1fr;gap:14px;padding:14px 20px 20px;flex:1}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.card{background:var(--card);border:1px solid var(--border);border-radius:15px;overflow:hidden}
+.card h2{font-size:13px;font-weight:800;padding:13px 16px 11px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.card h2 .cnt{margin-left:auto;font-size:10.5px;background:var(--chip);border:1px solid var(--border);color:var(--mid);border-radius:999px;padding:2px 9px;font-weight:700}
+.card h2 .cnt.hot{color:#06222b;background:var(--amber);border-color:var(--amber)}
+
+/* flux */
+.feed{max-height:56vh;overflow-y:auto;padding:6px 0}
+.ev{display:flex;gap:11px;padding:9px 16px;border-bottom:1px solid rgba(125,211,252,.06);animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(-6px)}to{opacity:1}}
+.ev .ic{width:30px;height:30px;border-radius:9px;background:var(--chip);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;flex:none}
+.ev .tx{font-size:12.5px;color:var(--mid);line-height:1.5;flex:1}
+.ev .tx b{color:var(--text)}
+.ev .tm{font-size:10.5px;color:var(--dim);flex:none;padding-top:2px;font-variant-numeric:tabular-nums}
+.ev.urg .ic{background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.4)}
+.ev.ok .ic{background:rgba(45,212,191,.1);border-color:rgba(45,212,191,.35)}
+
+/* file à traiter */
+.queue{padding:6px 10px 10px}
+.qi{display:flex;gap:10px;align-items:flex-start;background:var(--chip);border:1px solid var(--border);border-radius:12px;padding:11px 12px;margin:7px 6px}
+.qi.urg{border-color:rgba(248,113,113,.45);background:rgba(248,113,113,.07)}
+.qi .qic{font-size:16px;flex:none;margin-top:1px}
+.qi .qt{flex:1;font-size:12px;color:var(--mid);line-height:1.5}
+.qi .qt b{color:var(--text);display:block;font-size:12.5px}
+.qi button{border:1px solid rgba(45,212,191,.4);background:rgba(45,212,191,.1);color:var(--teal);border-radius:9px;padding:6px 11px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;flex:none}
+.qi button:hover{background:rgba(45,212,191,.2)}
+.qempty{text-align:center;color:var(--dim);font-size:12px;padding:18px}
+
+/* agents */
+.agents{padding:8px 10px 12px;display:flex;flex-direction:column;gap:7px}
+.agrow{display:flex;align-items:center;gap:11px;background:var(--chip);border:1px solid var(--border);border-radius:12px;padding:10px 12px;transition:.2s}
+.agrow.off{opacity:.45}
+.agrow .aic{font-size:17px;flex:none}
+.agrow .anm{flex:1;min-width:0}
+.agrow .anm b{font-size:12.5px;display:block}
+.agrow .anm span{font-size:10.5px;color:var(--dim)}
+.sw{position:relative;width:38px;height:21px;border-radius:999px;background:#233247;border:1px solid var(--border);cursor:pointer;flex:none;transition:.2s}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#8496ad;transition:.2s}
+.sw.on{background:rgba(45,212,191,.35);border-color:var(--teal)}
+.sw.on::after{left:19px;background:var(--teal)}
+
+footer{text-align:center;color:var(--dim);font-size:12px;padding:14px 10px;border-top:1px solid var(--border)}
+footer b{color:var(--text)}
+@media(max-width:840px){.grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.hr{flex-wrap:wrap;justify-content:flex-end}}
+</style>
+</head>
+<body>
+<div class="demo-note">Démo Arkneys</div>
+<div class="app">
+
+<header>
+  <div class="htile">🖥️</div>
+  <div class="hinfo">
+    <div class="nm">Centre de commande</div>
+    <div class="st">Vue praticien · Dre Favre</div>
+    <div class="lg">Cabinet dentaire du Léman · validation humaine systématique</div>
+  </div>
+  <div class="hr">
+    <div class="status"><span class="pulse" id="pulse"></span><span id="stxt">6 agents actifs</span></div>
+    <a class="dashlink" href="dashboard" target="_blank" rel="noopener">📊 Dashboard mensuel ↗</a>
+    <button class="master" id="master">⏸️ Tout suspendre</button>
+  </div>
+</header>
+
+<div class="kpis">
+  <div class="kpi"><div class="t">Appels traités aujourd'hui</div><div class="n" id="kcalls">9<small>dont 3 hors horaires</small></div></div>
+  <div class="kpi"><div class="t">RDV pris par les agents</div><div class="n" id="krdv">4</div></div>
+  <div class="kpi"><div class="t">SMS envoyés</div><div class="n" id="ksms">12</div></div>
+  <div class="kpi"><div class="t">À traiter par l'équipe</div><div class="n" id="kqueue">5</div></div>
+</div>
+
+<div class="grid">
+
+  <!-- ==== colonne flux ==== -->
+  <div class="col">
+    <div class="card">
+      <h2>📡 Flux temps réel <span class="cnt" id="feedcnt">en direct</span></h2>
+      <div class="feed" id="feed"></div>
+    </div>
+  </div>
+
+  <!-- ==== colonne droite ==== -->
+  <div class="col">
+    <div class="card">
+      <h2>📥 À traiter par l'équipe <span class="cnt hot" id="qcnt">5</span></h2>
+      <div class="queue" id="queue"></div>
+    </div>
+    <div class="card">
+      <h2>🤖 Agents <span class="cnt" id="agcnt">6/6 actifs</span></h2>
+      <div class="agents" id="agents"></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>△ Propulsé par <b>Arkneys</b> — studio IA suisse 🇨🇭 · démo, données fictives · l'équipe garde toujours la main</footer>
+</div>
+
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+function now(offMin){const d=new Date(Date.now()-(offMin||0)*60000);
+ return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+
+/* ================= AGENTS ================= */
+const AGENTS=[
+ {id:'m1',ic:'📞',nm:'Réceptionniste vocal',st:'9 appels aujourd’hui',on:true},
+ {id:'m2',ic:'💬',nm:'Rappels & confirmations SMS',st:'12 SMS · 2 confirmations reçues',on:true},
+ {id:'m3',ic:'🔄',nm:'Réactivation patients',st:'3 relances · 1 RDV repris',on:true},
+ {id:'m4',ic:'🚨',nm:'Tri d’urgence',st:'1 urgence orientée ce matin',on:true},
+ {id:'m5',ic:'📋',nm:'Préparation de consultation',st:'2 synthèses déposées',on:true},
+ {id:'m6',ic:'🗂️',nm:'Assistant administratif',st:'5 demandes traitées',on:true}];
+
+function drawAgents(){
+ const w=$('agents');w.innerHTML='';
+ AGENTS.forEach(a=>{
+  const r=document.createElement('div');r.className='agrow'+(a.on?'':' off');
+  r.innerHTML='<div class="aic">'+a.ic+'</div><div class="anm"><b>'+a.nm+'</b><span>'+(a.on?a.st:'suspendu par l’équipe')+'</span></div>';
+  const s=document.createElement('div');s.className='sw'+(a.on?' on':'');
+  s.onclick=()=>{a.on=!a.on;drawAgents();
+   addEv(a.on?'ok':'urg','🎛️','<b>'+a.nm+'</b> '+(a.on?'réactivé':'suspendu')+' par la Dre Favre',0);
+   syncStatus();};
+  r.appendChild(s);w.appendChild(r);});
+ syncStatus();}
+
+function syncStatus(){
+ const n=AGENTS.filter(a=>a.on).length;
+ $('agcnt').textContent=n+'/6 actifs';
+ $('stxt').textContent=n===0?'Tous les agents suspendus':(n+' agent'+(n>1?'s':'')+' actif'+(n>1?'s':''));
+ $('pulse').className='pulse'+(n===0?' off':'');}
+
+/* ================= FILE À TRAITER ================= */
+const QUEUE=[
+ {ic:'🚨',urg:true, t:'Urgence orientée — M. K***',d:'Douleur intense sans signes graves. Créneau prioritaire proposé aujourd’hui 11h40. À confirmer.',b:'Confirmer ✓'},
+ {ic:'📋',t:'Synthèse de préparation — RDV jeu 14h30',d:'Motif : « douleur en mâchant, côté droit » · allergie pénicilline. À lire avant la consultation.',b:'Lue ✓'},
+ {ic:'📄',t:'Attestation de soins — Mme Dupont',d:'Demande vérifiée (identité OK), document généré. Prêt pour signature.',b:'Signée ✓'},
+ {ic:'😠',t:'Litige facture — M. V***',d:'Conteste la facture du 28.06. L’agent n’a rien promis. Rappel à faire sous 24 h.',b:'Rappelé ✓'},
+ {ic:'📞',t:'Demande de rappel — Mme P***',d:'Question tarifaire complexe (implant + complémentaire). Numéro noté : 079 ··· ·· ··',b:'Rappelée ✓'}];
+
+function drawQueue(){
+ const w=$('queue');w.innerHTML='';
+ if(!QUEUE.length){w.innerHTML='<div class="qempty">🎉 Tout est traité — les agents gèrent le reste.</div>';}
+ QUEUE.forEach((q,i)=>{
+  const d=document.createElement('div');d.className='qi'+(q.urg?' urg':'');
+  d.innerHTML='<div class="qic">'+q.ic+'</div><div class="qt"><b>'+q.t+'</b>'+q.d+'</div>';
+  const b=document.createElement('button');b.textContent=q.b;
+  b.onclick=()=>{QUEUE.splice(i,1);drawQueue();
+   addEv('ok','✅','<b>'+q.t+'</b> — marqué traité par l’équipe',0);};
+  d.appendChild(b);w.appendChild(d);});
+ $('qcnt').textContent=QUEUE.length;$('kqueue').textContent=QUEUE.length;}
+
+/* ================= FLUX TEMPS RÉEL ================= */
+function addEv(cls,ic,html,offMin,append){
+ const f=$('feed');const d=document.createElement('div');
+ d.className='ev'+(cls?' '+cls:'');
+ d.innerHTML='<div class="ic">'+ic+'</div><div class="tx">'+html+'</div><div class="tm">'+now(offMin)+'</div>';
+ if(append)f.appendChild(d);else f.insertBefore(d,f.firstChild);
+ while(f.children.length>40)f.removeChild(f.lastChild);}
+
+const SEED=[
+ ['ok','📞','<b>Appel traité</b> (débordement, 2 min 12) — RDV contrôle pris <b>mar 10h</b>, écrit dans l’agenda',4],
+ ['','💬','<b>Rappel SMS J-1</b> envoyé à M. D*** — RDV demain 9h15',9],
+ ['ok','🗂️','<b>Attestation demandée</b> par Mme Dupont — identité vérifiée, mise en file de signature',16],
+ ['urg','🚨','<b>Urgence triée</b> — M. K***, douleur 8/10, aucun signe grave → créneau prioritaire proposé',24],
+ ['','🔄','<b>Réactivation</b> — Mme S*** (14 mois sans contrôle) a répondu : RDV pris <b>ven 15h</b>',31],
+ ['','📋','<b>Synthèse de préparation</b> déposée pour le RDV de jeu 14h30 (Dre Favre)',42],
+ ['ok','📞','<b>Appel hors horaires</b> (7h41, DE) — nouveau patient, RDV pris <b>jeu 8h30</b>',55],
+ ['','🔒','<b>Demande d’un tiers refusée</b> — aucune information divulguée (règle nLPD)',63],
+ ['','💬','<b>Confirmation reçue</b> — Mme T*** confirme son RDV de vendredi (répondu « OUI »)',71]];
+
+const POOL=[
+ ['ok','📞','<b>Appel traité</b> — question horaires + accès, réponse en 40 s, aucune action requise'],
+ ['','💬','<b>Rappel SMS J-2</b> envoyé à Frau B*** — RDV jeudi 11h (message en allemand)'],
+ ['ok','📞','<b>Appel en soins</b> — déplacement de RDV géré, créneau libéré proposé à la liste d’attente'],
+ ['','🔄','<b>Réactivation</b> — relance douce envoyée à 2 patients (18 et 21 mois sans contrôle)'],
+ ['','🗂️','<b>Question facturation</b> — tiers garant expliqué, aucune promesse de remboursement'],
+ ['ok','📞','<b>Appel anglais</b> — bascule EN automatique, demande de nouveau patient enregistrée'],
+ ['','📋','<b>Questionnaire J-2</b> envoyé au patient du RDV de vendredi 9h (SMS)'],
+ ['','💬','<b>Non-confirmé relancé</b> — M. G*** n’a pas répondu au J-2, relance J-1 programmée'],
+ ['ok','🗂️','<b>Demande ambiguë</b> → transmise à l’équipe avec demande de rappel (règle appliquée)']];
+
+let feedTimer=null;
+function startFeed(){
+ if(feedTimer)clearInterval(feedTimer);
+ feedTimer=setInterval(()=>{
+  if(!AGENTS.some(a=>a.on))return;
+  const e=POOL[Math.floor(Math.random()*POOL.length)];
+  addEv(e[0],e[1],e[2],0);
+ },6500);}
+
+/* ================= MASTER ================= */
+let paused=false;
+$('master').onclick=()=>{
+ paused=!paused;
+ AGENTS.forEach(a=>a.on=!paused);
+ drawAgents();
+ $('master').textContent=paused?'▶️ Tout réactiver':'⏸️ Tout suspendre';
+ $('master').className='master'+(paused?' paused':'');
+ addEv(paused?'urg':'ok','🎛️','<b>'+(paused?'Tous les agents suspendus':'Tous les agents réactivés')+'</b> — action de la Dre Favre (l’équipe garde toujours la main)',0);};
+
+/* ================= INIT ================= */
+SEED.slice().reverse().forEach(e=>addEv(e[0],e[1],e[2],e[3],false));
+drawQueue();drawAgents();startFeed();
+</script>
+</body>
+</html>
