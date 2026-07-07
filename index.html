@@ -54,6 +54,31 @@ a.mod{color:inherit}
 .simhead p{color:var(--mid);font-size:13px;line-height:1.6}
 .scenrow{display:flex;gap:9px;flex-wrap:wrap;padding:12px 16px}
 .scen.sel{border-color:var(--teal);color:var(--text);background:rgba(45,212,191,.08)}
+/* console cabinet */
+.ccstats{display:flex;gap:10px;flex-wrap:wrap;padding:2px 16px 10px}
+.ccstat{flex:1;min-width:105px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;text-align:center}
+.ccstat .n{font-size:21px;font-weight:800;color:var(--text)}
+.ccstat .l{font-size:9.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.07em;margin-top:2px}
+.ccwrap{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;padding:0 16px 12px}
+@media(max-width:860px){.ccwrap{grid-template-columns:1fr}}
+.cccard{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 16px}
+.cccard h3{font-size:13px;margin-bottom:10px;color:var(--text)}
+.cccard h3 small{color:var(--dim);font-weight:600}
+.ccbadge{display:inline-block;min-width:20px;text-align:center;background:#ed8030;color:#0a0f16;border-radius:999px;font-size:11px;font-weight:800;padding:1px 6px;margin-left:6px;vertical-align:1px}
+.ccfeed{display:flex;flex-direction:column;gap:7px;max-height:48vh;overflow-y:auto}
+.ccline{font-size:12px;color:var(--mid);background:var(--chip);border:1px solid var(--border);border-radius:10px;padding:8px 10px;animation:pop .3s ease}
+.ccline b{color:var(--text)}
+.ccline .t{color:var(--dim);font-size:10.5px;margin-right:7px;font-variant-numeric:tabular-nums}
+.ccit{display:flex;gap:9px;align-items:flex-start;background:var(--chip);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:8px;font-size:12px;color:var(--mid);line-height:1.5}
+.ccit b{color:var(--text)}
+.ccit button{margin-left:auto;flex:none;background:rgba(45,212,191,.12);border:1px solid rgba(45,212,191,.4);color:var(--teal);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+.ccit.done{opacity:.4}
+.ccit.done button{border-color:var(--border);color:var(--dim);background:transparent;cursor:default}
+.ccag{display:flex;align-items:center;gap:9px;padding:8px 2px;border-bottom:1px solid var(--border);font-size:12.5px;color:var(--text)}
+.ccag:last-child{border-bottom:none}
+.ccag .st{margin-left:auto;font-size:10px;font-weight:800;letter-spacing:.05em;color:var(--teal)}
+.ccag .st.off{color:var(--dim)}
+.ccag button{background:transparent;border:1px solid var(--border);color:var(--mid);border-radius:8px;padding:4px 9px;font-size:10.5px;cursor:pointer;font-family:inherit}
 .scen{background:var(--chip);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:10px 15px;cursor:pointer;font-size:12.5px;font-weight:600;font-family:inherit}
 .scen:hover{border-color:var(--teal)}
 .scen.on{border-color:var(--teal);background:rgba(45,212,191,.1)}
@@ -136,7 +161,9 @@ footer b{color:var(--text)}
     <button class="tab" data-p="m5">📋 Préparation consult.</button>
     <button class="tab" data-p="m6">🗂️ Assistant admin</button>
     <button class="tab" data-p="live">🎙️ Appel live</button>
+    <button class="tab" data-p="cc">🖥️ Console cabinet</button>
     <a class="tab" href="dashboard" target="_blank" rel="noopener">📊 Dashboard cabinet ↗</a>
+    <a class="tab" href="Console_Medecin.html" target="_blank" rel="noopener">🖥️ Centre de commande ↗</a>
   </nav>
 
   <!-- ============ ACCUEIL ============ -->
@@ -154,7 +181,9 @@ footer b{color:var(--text)}
       <button class="mod" data-go="m4"><div class="mi">🚨</div><div class="mn">Module 4 · Tri d'urgence <small>OPTION</small></div><div class="md">Qualifie la douleur (aiguë / modérée) et attribue un créneau prioritaire — sans jamais poser de diagnostic.</div><span class="mb">Simuler un appel urgent →</span></button>
       <button class="mod" data-go="m5"><div class="mi">📋</div><div class="mn">Module 5 · Préparation de consultation <small>OPTION</small></div><div class="md">Contacte le patient par SMS/WhatsApp 24-48h avant le RDV, recueille motif, traitements et allergies — et remet au praticien une synthèse de 6 lignes. Collecte sans jamais interpréter.</div><span class="mb">Vivre la conversation patient →</span></button>
       <button class="mod" data-go="m6"><div class="mi">🗂️</div><div class="mn">Module 6 · Assistant administratif <small>OPTION</small></div><div class="md">Traite les demandes non médicales par téléphone, e-mail et formulaire : horaires, documents, attestations, facturation de base. Tout le médical part à l'équipe.</div><span class="mb">Poser une question →</span></button>
+      <button class="mod" data-go="cc"><div class="mi">🖥️</div><div class="mn">Console cabinet · supervision</div><div class="md">La vue de l'équipe : flux temps réel des 6 agents, demandes à valider, mise en pause d'un module en un clic. L'IA propose, le cabinet garde la main.</div><span class="mb">Ouvrir la console →</span></button>
       <a class="mod" href="dashboard" target="_blank" rel="noopener"><div class="mi">📊</div><div class="mn">Dashboard cabinet · la preuve chiffrée</div><div class="md">Valeur générée en francs, appels hors horaires captés, no-shows évités, patients réactivés — le rapport mensuel que reçoit le cabinet.</div><span class="mb">Ouvrir le dashboard ↗</span></a>
+      <a class="mod" href="Console_Medecin.html" target="_blank" rel="noopener"><div class="mi">🖥️</div><div class="mn">Centre de commande · vue praticien</div><div class="md">Flux temps réel de tous les agents, file « à traiter » pour l'équipe, et interrupteur par agent — le praticien garde toujours la main.</div><span class="mb">Ouvrir le centre de commande ↗</span></a>
     </div>
   </div>
 
@@ -251,6 +280,29 @@ footer b{color:var(--text)}
     <p class="note">Garde-fous : aucune information patient sans vérification d'identité (nom + date de naissance), réponses générales uniquement sur la LAMal — jamais de promesse de prise en charge —, médical / litiges / demandes de tiers → transmis à l'équipe.</p>
   </div>
 
+  <!-- ============ CONSOLE CABINET ============ -->
+  <div class="panel" id="p-cc">
+    <div class="simhead"><h2>🖥️ Console cabinet — supervision des agents</h2>
+    <p>La vue de l'équipe : <b>tout ce que font les agents, en temps réel</b>, et ce qui attend une décision humaine. Rien ne part sans contrôle — <b>l'IA propose, le cabinet garde la main.</b> Mettez un agent en pause, validez une demande : tout réagit.</p></div>
+    <div class="ccstats">
+      <div class="ccstat"><div class="n" id="ccS1">23</div><div class="l">Appels aujourd'hui</div></div>
+      <div class="ccstat"><div class="n" id="ccS2">9</div><div class="l">RDV pris</div></div>
+      <div class="ccstat"><div class="n" id="ccS3">14</div><div class="l">SMS envoyés</div></div>
+      <div class="ccstat"><div class="n" id="ccS4">1</div><div class="l">Urgence orientée</div></div>
+    </div>
+    <div class="ccwrap">
+      <div class="cccard"><h3>Flux temps réel <small>· toutes les actions sont journalisées</small></h3>
+        <div class="ccfeed" id="ccfeed"></div></div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="cccard"><h3>À valider par l'équipe<span class="ccbadge" id="ccbadge">4</span></h3>
+          <div id="ccitems"></div></div>
+        <div class="cccard"><h3>Agents <small>· pause en un clic</small></h3>
+          <div id="ccagents"></div></div>
+      </div>
+    </div>
+    <p class="note">En production : notifications push/e-mail au cabinet, journal complet exportable, droits par collaborateur, validation humaine systématique — conforme nLPD, hébergé en Suisse.</p>
+  </div>
+
   <!-- ============ APPEL LIVE ============ -->
   <div class="panel" id="p-live">
     <div class="simhead"><h2>🎙️ Appel live — parlez à l'agent</h2>
@@ -291,7 +343,8 @@ const tabs=document.querySelectorAll('.tab'),panels=document.querySelectorAll('.
 function goTab(n){tabs.forEach(x=>x.classList.remove('on'));panels.forEach(p=>p.classList.remove('on'));
  document.querySelector(`.tab[data-p="${n}"]`).classList.add('on');document.getElementById('p-'+n).classList.add('on');
  if(n==='m5'&&typeof prepStart==='function'&&prepStep<0)prepStart();
- if(n==='m6'&&typeof admStart==='function'&&!admStarted)admStart();}
+ if(n==='m6'&&typeof admStart==='function'&&!admStarted)admStart();
+ if(n==='cc'&&typeof ccStart==='function')ccStart();}
 tabs.forEach(t=>{if(t.dataset.p)t.onclick=()=>goTab(t.dataset.p);});
 document.querySelectorAll('.mod').forEach(m=>{if(m.dataset.go)m.onclick=()=>goTab(m.dataset.go);});
 document.getElementById('theme').onclick=e=>{document.body.classList.toggle('light');
@@ -591,6 +644,66 @@ document.querySelectorAll('#p-m6 .scen[data-ch]').forEach(b=>{b.onclick=()=>{
  document.querySelectorAll('#p-m6 .scen[data-ch]').forEach(x=>x.classList.remove('sel'));
  b.classList.add('sel');
  admMsg('s','Canal : '+b.dataset.ch+' — même agent, mêmes règles');};});
+
+/* ===================================================== */
+/* ========= CONSOLE CABINET (supervision) ============= */
+/* ===================================================== */
+const CCAG=[["m1","📞","Réceptionniste vocal"],["m2","💬","Rappels SMS"],["m3","🔄","Réactivation"],
+            ["m4","🚨","Tri d'urgence"],["m5","📋","Préparation consult."],["m6","🗂️","Assistant admin"]];
+const CCNAMES=["M. D***","Mme R***","M. K***","Frau B***","Mme L***","M. S***","Mme T***","Herr M***"];
+let ccOn={m1:1,m2:1,m3:1,m4:1,m5:1,m6:1},ccTimer=null;
+const ccName=()=>CCNAMES[Math.floor(Math.random()*CCNAMES.length)];
+/* [module, texte, +appel, +rdv, +sms] */
+const CCEVTS=[
+ ["m1",()=>"<b>Appel décroché</b> ("+(Math.random()<.45?"hors horaires":"débordement")+") — RDV pris pour "+ccName(),1,1,0],
+ ["m1",()=>"<b>Appel décroché</b> — question d'accès, info donnée à "+ccName(),1,0,0],
+ ["m2",()=>"<b>Rappel SMS</b> envoyé à "+ccName()+" (RDV demain)",0,0,1],
+ ["m2",()=>"<b>Confirmation reçue</b> « OUI » — RDV de "+ccName()+" confirmé",0,0,0],
+ ["m3",()=>"<b>Patient réactivé</b> : "+ccName()+" — contrôle planifié",0,1,1],
+ ["m4",()=>"<b>Urgence modérée triée</b> — créneau prioritaire proposé à "+ccName(),1,0,0],
+ ["m5",()=>"<b>Synthèse de préparation</b> déposée dans le dossier de "+ccName(),0,0,1],
+ ["m6",()=>"<b>Attestation enregistrée</b> pour "+ccName()+" — identité vérifiée ✓",0,0,0],
+ ["m6",()=>"<b>Demande de rappel notée</b> ("+ccName()+") — question de facturation",0,0,0]];
+let CCITEMS=[
+ {i:"😠",t:"<b>Litige facture</b> — Mme P*** demande un rappel (Assistant admin)",b:"Rappeler",done:false},
+ {i:"📄",t:"<b>Attestation à signer</b> — M. K*** (délai : 5 jours ouvrés)",b:"Faite",done:false},
+ {i:"❓",t:"<b>Question médicale notée</b> (préparation) : « C'est grave docteur ? » — à traiter en consultation",b:"Vu",done:false},
+ {i:"🚨",t:"<b>Urgence orientée 144</b> hier 21:32 — suivi patient recommandé",b:"Vu",done:false}];
+const ccStats={a:23,r:9,s:14,u:1};
+
+function ccTime(){return new Date().toTimeString().slice(0,5);}
+function ccLine(mod,html){const f=document.getElementById('ccfeed');const d=document.createElement('div');
+ d.className='ccline';const ag=CCAG.find(a=>a[0]===mod);
+ d.innerHTML='<span class="t">'+ccTime()+'</span>'+ag[1]+' '+html;
+ f.prepend(d);while(f.children.length>25)f.removeChild(f.lastChild);}
+function ccRenderStats(){ccS1.textContent=ccStats.a;ccS2.textContent=ccStats.r;ccS3.textContent=ccStats.s;ccS4.textContent=ccStats.u;}
+function ccRenderItems(){const w=document.getElementById('ccitems');w.innerHTML='';
+ CCITEMS.forEach((it,idx)=>{const d=document.createElement('div');d.className='ccit'+(it.done?' done':'');
+  d.innerHTML='<span>'+it.i+'</span><span>'+it.t+'</span>';
+  const b=document.createElement('button');b.textContent=it.done?'✓ Traité':it.b+' ✓';
+  if(!it.done)b.onclick=()=>{it.done=true;ccRenderItems();ccLine('m6','<b>Validation équipe</b> — demande traitée manuellement ✓');};
+  d.appendChild(b);w.appendChild(d);});
+ const n=CCITEMS.filter(i=>!i.done).length;
+ document.getElementById('ccbadge').textContent=n;
+ document.getElementById('ccbadge').style.display=n?'inline-block':'none';}
+function ccRenderAgents(){const w=document.getElementById('ccagents');w.innerHTML='';
+ CCAG.forEach(a=>{const d=document.createElement('div');d.className='ccag';
+  const on=ccOn[a[0]];
+  d.innerHTML='<span>'+a[1]+'</span><span>'+a[2]+'</span><span class="st'+(on?'':' off')+'">'+(on?'● ACTIF':'⏸ EN PAUSE')+'</span>';
+  const b=document.createElement('button');b.textContent=on?'Suspendre':'Activer';
+  b.onclick=()=>{ccOn[a[0]]=on?0:1;ccRenderAgents();
+   ccLine(a[0],on?'<b>Agent suspendu</b> par l\'équipe — plus aucune action jusqu\'à réactivation':'<b>Agent réactivé</b> par l\'équipe ✓');};
+  d.appendChild(b);w.appendChild(d);});}
+function ccTick(){const pool=CCEVTS.filter(e=>ccOn[e[0]]);if(!pool.length)return;
+ const e=pool[Math.floor(Math.random()*pool.length)];
+ ccLine(e[0],e[1]());ccStats.a+=e[2];ccStats.r+=e[3];ccStats.s+=e[4];ccRenderStats();
+ if(Math.random()<.12){CCITEMS.push({i:"📄",t:"<b>Nouvelle attestation à signer</b> — "+ccName()+" (délai : 5 jours ouvrés)",b:"Faite",done:false});ccRenderItems();}}
+function ccStart(){if(ccTimer){return;}
+ ccRenderStats();ccRenderItems();ccRenderAgents();
+ ccLine('m2','<b>Rappel SMS</b> envoyé à '+ccName()+' (RDV demain 9h)');
+ ccLine('m6','<b>Attestation enregistrée</b> pour '+ccName()+' — identité vérifiée ✓');
+ ccLine('m1','<b>Appel décroché</b> (hors horaires) — RDV pris pour '+ccName());
+ ccTimer=setInterval(ccTick,2600);}
 
 /* ===================================================== */
 /* ============ APPEL LIVE (voix réelle) =============== */
