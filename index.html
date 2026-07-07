@@ -92,6 +92,20 @@ nav{display:flex;flex-wrap:wrap;gap:7px;padding:12px 14px;justify-content:center
 .urg-a{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.4)}
 .urg-m{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.4)}
 .urgcard b{display:block;margin-bottom:5px}
+.livegrid{display:flex;gap:12px;flex-wrap:wrap;margin:0 16px 10px;align-items:flex-start}
+.livegrid .callbox{flex:1 1 340px;margin:0}
+.agwrap{flex:0 1 300px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:12px;min-width:270px}
+.agwrap h3{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.agwrap h3 small{color:var(--dim);letter-spacing:0;text-transform:none;font-weight:400}
+.ag{display:grid;grid-template-columns:34px repeat(6,1fr);gap:3px;font-size:9.5px}
+.ag .hd{color:var(--dim);text-align:center;padding:3px 0;font-weight:700;line-height:1.2}
+.ag .hr{color:var(--dim);text-align:right;padding-right:4px;line-height:16px}
+.ag .cell{height:16px;border-radius:4px;background:rgba(45,212,191,.18);border:1px solid rgba(45,212,191,.25)}
+.ag .cell.busy{background:var(--chip);border-color:var(--border);opacity:.5}
+.ag .cell.off{background:transparent;border:none}
+.ag .cell.booked{background:#ed8030;border-color:#ed8030;animation:pop .4s ease}
+.aglegend{display:flex;gap:12px;margin-top:9px;font-size:10px;color:var(--dim)}
+.aglegend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px;font-style:normal}
 footer{text-align:center;color:var(--dim);font-size:12px;padding:14px 10px;border-top:1px solid var(--border);margin-top:auto}
 footer b{color:var(--text)}
 .demo-note{position:fixed;top:10px;right:10px;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#06222b;background:#a5f3fc;font-weight:800;padding:5px 10px;border-radius:999px;z-index:50;opacity:.92}
@@ -199,17 +213,24 @@ footer b{color:var(--text)}
   <div class="panel" id="p-live">
     <div class="simhead"><h2>🎙️ Appel live — parlez à l'agent</h2>
     <p>Ici, ce n'est plus un script : <b>vous parlez, l'agent vous répond à voix haute.</b> Prenez un rendez-vous, annulez, décrivez une douleur — comme au téléphone. (Fonctionne dans Chrome, micro requis.)</p></div>
-    <div class="callbox" style="margin-bottom:10px">
+    <div class="livegrid">
+    <div class="callbox">
       <div class="callbar"><div class="cav" id="lav">📞</div><div><div class="cn">Cabinet dentaire du Léman</div><div class="cs" id="lstate">Prêt à décrocher</div></div><div class="dur" id="ldur">00:00</div></div>
       <div style="display:flex;justify-content:center;gap:12px;padding:16px">
         <button class="gen" id="callbtn" style="margin:0">📞 Appeler le cabinet</button>
         <button class="gen" id="hangbtn" style="margin:0;background:rgba(248,113,113,.15);color:var(--red);border:1px solid rgba(248,113,113,.4);display:none">🔴 Raccrocher</button>
       </div>
-      <div class="trans" id="ltrans" style="min-height:180px"><div class="ls">Clique « Appeler le cabinet », autorise le micro, puis parle après le bip visuel 🎤.</div></div>
+      <div class="trans" id="ltrans" style="min-height:180px"><div class="ls">Clique « Appeler le cabinet », autorise le micro, puis parle après le bip visuel 🎤. Essaie : « un rendez-vous jeudi à dix-neuf heures ».</div></div>
       <div style="display:none;gap:8px;padding:11px 14px;border-top:1px solid var(--border)" id="fallbar">
         <input id="fbin" type="text" placeholder="(Micro indisponible) Écris ta réponse ici…" style="flex:1;background:var(--chip);border:1px solid var(--border);border-radius:12px;padding:11px 14px;color:var(--text);font-size:13px;font-family:inherit;outline:none">
         <button class="gen" id="fbsend" style="margin:0;padding:11px 16px">➤</button>
       </div>
+    </div>
+    <div class="agwrap">
+      <h3>Agenda du cabinet <small>connexion simulée</small></h3>
+      <div class="ag" id="ag"></div>
+      <div class="aglegend"><span><i style="background:rgba(45,212,191,.5)"></i>libre</span><span><i style="background:#1e293b"></i>occupé</span><span><i style="background:#ed8030"></i>votre RDV</span></div>
+    </div>
     </div>
     <p class="note">Démo navigateur (voix du système). En production : voix naturelle premium (ElevenLabs), vrai numéro suisse, connexion directe à l'agenda Zawin/Vitodent/OneDoc, journal d'appel conforme nLPD.</p>
   </div>
@@ -402,35 +423,127 @@ document.getElementById('fbsend').onclick=()=>{const t=fbin.value.trim();if(!t||
  fbin.value='';lline('c',t);handleVoice(t);};
 fbin.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('fbsend').click();});
 
+/* ---- AGENDA SIMULÉ (6 prochains jours ouvrés, créneaux d'1h) ---- */
+const DAYN=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+const DAYS3=['dim','lun','mar','mer','jeu','ven','sam'];
+const AGENDA=[];
+(function(){let d=new Date();let guard=0;
+ while(AGENDA.length<6&&guard<14){guard++;
+  if(d.getDay()!==0){const sat=d.getDay()===6;const hours={};
+   for(let h=8;h<=(sat?11:17);h++){hours[h]=((h*7+d.getDate()*3+AGENDA.length*5)%10)<5?'busy':'free';}
+   // garantir au moins 2 créneaux libres par jour
+   let free=Object.values(hours).filter(v=>v==='free').length;
+   if(free<2){hours[10]='free';hours[sat?9:15]='free';}
+   AGENDA.push({date:new Date(d),wd:d.getDay(),hours});}
+  d=new Date(d.getTime()+86400000);}
+})();
+const HW={8:'huit heures',9:'neuf heures',10:'dix heures',11:'onze heures',12:'midi',13:'treize heures',14:'quatorze heures',15:'quinze heures',16:'seize heures',17:'dix-sept heures'};
+function dayLabel(day){const today=new Date();
+ if(day.date.toDateString()===today.toDateString())return "aujourd'hui";
+ if(day.date.toDateString()===new Date(today.getTime()+86400000).toDateString())return 'demain';
+ return DAYN[day.wd]+' '+day.date.getDate();}
+function slotSay(day,h){return dayLabel(day)+' à '+HW[h];}
+function renderAgenda(){const ag=document.getElementById('ag');if(!ag)return;
+ let html='<div class="hd"></div>'+AGENDA.map(d=>`<div class="hd">${DAYS3[d.wd]}<br>${d.date.getDate()}</div>`).join('');
+ for(let h=8;h<=17;h++){html+=`<div class="hr">${h}h</div>`;
+  AGENDA.forEach(d=>{const s=d.hours[h];
+   html+=s===undefined?'<div class="cell off"></div>':`<div class="cell ${s}" id="ag-${AGENDA.indexOf(d)}-${h}"></div>`;});}
+ ag.innerHTML=html;}
+renderAgenda();
+function bookSlot(di,h){AGENDA[di].hours[h]='booked';renderAgenda();}
+function freeSlotsOfDay(di,nearH){const d=AGENDA[di];
+ return Object.keys(d.hours).map(Number).filter(h=>d.hours[h]==='free')
+  .sort((a,b)=>Math.abs(a-(nearH??12))-Math.abs(b-(nearH??12)));}
+function findProposals(wantDi,wantH){const out=[];
+ if(wantDi!==null){freeSlotsOfDay(wantDi,wantH).slice(0,2).forEach(h=>out.push([wantDi,h]));}
+ if(out.length<2){for(let i=0;i<AGENDA.length&&out.length<2;i++){
+  if(i===wantDi)continue;
+  const hs=freeSlotsOfDay(i,wantH);
+  if(hs.length)out.push([i,hs[0]]);}}
+ return out;}
+
+/* ---- parseur heure + jour (chiffres ET lettres) ---- */
+function parseWhen(m){
+ let hour=null,di=null,part=null;
+ let x=m.match(/(\d{1,2})\s*(?:h(?:eures?)?|:)\s*(\d{2})?/);      // 19h, 19 h 30, 19:00
+ if(!x)x=m.match(/(?:à|a|vers|pour)\s+(\d{1,2})\b/);               // "à 19"
+ if(x){hour=parseInt(x[1],10);if(x[2]&&parseInt(x[2],10)>=30)part='half';}
+ if(hour===null){const words=[['dix-neuf',19],['dix-huit',18],['dix-sept',17],['seize',16],['quinze',15],['quatorze',14],['treize',13],['midi',12],['onze',11],['dix',10],['neuf',9],['huit',8]];
+  for(const[w,v]of words){if(m.includes(w+' heures')||m.includes(w+' heure')||(w==='midi'&&/\bmidi\b/.test(m))){hour=v;break;}}}
+ if(/après[- ]midi|apres[- ]midi/.test(m)&&hour&&hour<8)hour+=12;   // "à 3 de l'après-midi"
+ for(const d of AGENDA){if(m.includes(DAYN[d.wd])){di=AGENDA.indexOf(d);break;}}
+ if(di===null&&/demain/.test(m)){const t=new Date(Date.now()+86400000).toDateString();
+  di=AGENDA.findIndex(d=>d.date.toDateString()===t);if(di<0)di=null;}
+ if(di===null&&/aujourd'hui|aujourdhui/.test(m)){const t=new Date().toDateString();
+  di=AGENDA.findIndex(d=>d.date.toDateString()===t);if(di<0)di=null;}
+ if(hour===null){if(/\bmatin\b/.test(m))part='am';if(/après[- ]midi|apres[- ]midi/.test(m))part='pm';}
+ return {hour,di,part};
+}
+function proposeText(props){
+ if(!props.length)return "Je n'ai plus de disponibilité cette semaine — l'équipe vous rappellera pour la semaine suivante.";
+ if(props.length===1)return "Je peux vous proposer "+slotSay(AGENDA[props[0][0]],props[0][1])+". Ça vous convient ?";
+ return "Je peux vous proposer "+slotSay(AGENDA[props[0][0]],props[0][1])+", ou "+slotSay(AGENDA[props[1][0]],props[1][1])+". Lequel préférez-vous ?";
+}
+let pendingProps=[],chosen=null;
+
 /* ---- cerveau vocal (phrases courtes, orientées téléphone) ---- */
 function handleVoice(msg){
  const m=msg.toLowerCase();
  const has=(...k)=>k.some(x=>m.includes(x));
+ const yes=/\b(oui|ok|d'accord|parfait|très bien|volontiers|ça marche|va pour)\b/.test(m);
  let out=null,done=false;
 
+ /* --- choix de créneau en cours --- */
  if(vctx==='slots'){
-  if(has('samedi','9','neuf')){out="Parfait, c'est réservé : samedi neuf heures, contrôle avec la doctoresse Favre. Vous recevrez un SMS de confirmation. À samedi !";done=true;vctx=null;}
-  else if(has('jeudi','17','dix-sept')){out="Très bien : jeudi dix-sept heures trente, c'est noté. SMS de confirmation envoyé. À jeudi !";done=true;vctx=null;}
-  else{out="J'ai jeudi dix-sept heures trente, ou samedi neuf heures. Vous préférez lequel ?";}}
+  const w=parseWhen(m);
+  if(w.hour!==null||w.di!==null){
+   out=answerSlotRequest(w);
+  }else if(yes&&pendingProps.length){
+   chosen=/deuxième|second|2e/.test(m)&&pendingProps[1]?pendingProps[1]:pendingProps[0];
+   vctx='name';
+   out="Parfait, je note "+slotSay(AGENDA[chosen[0]],chosen[1])+". Votre nom et votre date de naissance pour la fiche ?";
+  }else if(/deuxième|second|le 2/.test(m)&&pendingProps[1]){
+   chosen=pendingProps[1];vctx='name';
+   out="Très bien, "+slotSay(AGENDA[chosen[0]],chosen[1])+". Votre nom et votre date de naissance ?";
+  }else if(/premier|le 1/.test(m)&&pendingProps[0]){
+   chosen=pendingProps[0];vctx='name';
+   out="Très bien, "+slotSay(AGENDA[chosen[0]],chosen[1])+". Votre nom et votre date de naissance ?";
+  }else{
+   out="Quel jour et quelle heure vous arrangeraient ? Par exemple : demain matin, ou jeudi à quinze heures.";
+  }}
+ else if(vctx==='name'){
+  if(chosen){bookSlot(chosen[0],chosen[1]);
+   const slotTxt=slotSay(AGENDA[chosen[0]],chosen[1]);
+   lline('s','✅ Rendez-vous écrit dans l\'agenda du cabinet (voir la grille) · SMS de confirmation envoyé — simulation');
+   out="Merci ! C'est confirmé : "+slotTxt+", avec la doctoresse Favre. Vous recevez le SMS de confirmation à l'instant. Puis-je faire autre chose pour vous ?";
+   chosen=null;pendingProps=[];vctx=null;}
+  else{vctx=null;out="C'est noté. Puis-je faire autre chose pour vous ?";}}
  else if(vctx==='triage'){vctx=null;
-  if(has('non','pas de')){vctx='urgslot';out="D'accord. Nous gardons des créneaux d'urgence chaque jour : le prochain est aujourd'hui à dix-sept heures quinze. Je vous le réserve ?";}
-  else{out="Ces signes demandent une prise en charge immédiate : appelez le cabinet dès l'ouverture au zéro vingt-et-un, ou le cent quarante-quatre en cas de détresse. Je préviens l'équipe.";done=true;}}
+  const no=has('non','pas de','aucun','rien de');
+  if(!no&&has('oui','gonfl','fièvre','fievre','avaler')){
+   out="Ces signes demandent une prise en charge immédiate : appelez le cabinet dès l'ouverture au zéro vingt-et-un, ou le cent quarante-quatre en cas de détresse. Je préviens l'équipe.";done=true;}
+  else{vctx='urgslot';out="D'accord. Nous gardons des créneaux d'urgence chaque jour : le prochain est aujourd'hui à dix-sept heures quinze. Je vous le réserve ?";}}
  else if(vctx==='urgslot'){vctx=null;
-  if(has('oui','d\'accord','ok','volontiers')){out="C'est réservé : aujourd'hui dix-sept heures quinze, urgence douleur. Évitez le chaud et le froid sur la dent d'ici là. Bon courage, à tout à l'heure !";done=true;}
+  if(yes){out="C'est réservé : aujourd'hui dix-sept heures quinze, urgence douleur. Évitez le chaud et le froid sur la dent d'ici là. Bon courage, à tout à l'heure !";done=true;}
   else{out="Très bien. Si la douleur augmente, rappelez-moi, je vous ferai passer en priorité. Autre chose ?";}}
  else if(vctx==='cxl'){vctx=null;
-  if(has('oui','report','autre','mardi')){out="C'est fait : votre rendez-vous est reporté à mardi quinze heures, sans frais. SMS de confirmation envoyé. Bonne journée !";done=true;}
+  if(yes||has('report','autre','déplacer')){vctx='slots';pendingProps=findProposals(null,null);
+   out="Très bien, reportons-le. "+proposeText(pendingProps);}
   else{out="C'est noté, votre rendez-vous est annulé. Le créneau est proposé à la liste d'attente. Bonne journée !";done=true;}}
+ /* --- intentions initiales --- */
  else if(/\bmal\b|douleur|rage de dent|urgence/.test(m)){vctx='triage';
   out="Je suis désolé pour cette douleur. Une question importante : avez-vous le visage gonflé, de la fièvre, ou du mal à avaler ?";}
- else if(has('annuler','annulation','déplacer','reporter')){vctx='cxl';
-  out="Bien sûr. Plutôt qu'annuler, je peux vous proposer un report sans frais, par exemple mardi quinze heures. Ça vous conviendrait ?";}
- else if(has('rendez-vous','rendez vous','contrôle','controle','détartrage','detartrage','hygiène','rdv')){vctx='slots';
-  out="Avec plaisir. Pour un contrôle, j'ai jeudi dix-sept heures trente ou samedi neuf heures. Lequel vous arrange ?";}
+ else if(has('annuler','annulation','reporter')&&!has('rendez-vous pour','rdv pour')){vctx='cxl';
+  out="Bien sûr. Plutôt qu'annuler, puis-je vous proposer un report sans frais ?";}
+ else if(has('rendez-vous','rendez vous','rdv','contrôle','controle','détartrage','detartrage','hygiène','hygiene')){
+  vctx='slots';
+  const w=parseWhen(m);
+  if(w.hour!==null||w.di!==null){out=answerSlotRequest(w);}
+  else{out="Avec plaisir. Quel jour et quelle heure vous arrangeraient le mieux ?";}}
  else if(has('tarif','prix','coûte','rembours','lamal')){
   out="L'assurance de base ne couvre pas les soins courants ; un contrôle avec détartrage débute vers cent quatre-vingts francs, et un devis est toujours établi avant tout traitement. Souhaitez-vous un rendez-vous ?";}
  else if(has('horaire','ouvert','adresse')){
-  out="Le cabinet est ouvert du lundi au vendredi, de huit heures à dix-huit heures, rue du Lac douze à Lausanne. Et moi je réponds vingt-quatre heures sur vingt-quatre. Je peux vous aider pour autre chose ?";}
+  out="Le cabinet est ouvert du lundi au vendredi de huit heures à dix-huit heures, et le samedi matin, rue du Lac douze à Lausanne. Moi, je réponds vingt-quatre heures sur vingt-quatre. Autre chose ?";}
  else if(has('bonjour','allô','allo','salut')){
   out="Bonjour ! Cabinet dentaire du Léman. Que puis-je faire pour vous : un rendez-vous, une annulation, ou une urgence ?";}
  else if(has('merci','au revoir','c\'est tout','rien')){
@@ -438,6 +551,42 @@ function handleVoice(msg){
  else{out="J'ai bien noté. Je peux prendre un rendez-vous, gérer une annulation, ou traiter une urgence douloureuse. Que souhaitez-vous ?";}
 
  speak(out,done?()=>setTimeout(hangup,900):listen);
+}
+
+/* répond à une demande jour/heure en consultant l'agenda */
+function answerSlotRequest(w){
+ let {hour,di,part}=w;
+ // dimanche demandé
+ if(di===null&&/dimanche/.test('')){}
+ // heure hors ouverture
+ if(hour!==null&&(hour>17||hour<8)){
+  const base=di!==null?di:0;
+  pendingProps=findProposals(di,17);
+  const lastTxt=(di!==null&&AGENDA[di].wd===6)?"onze heures le samedi":"dix-sept heures";
+  return "Je regarde l'agenda… le cabinet ferme à dix-huit heures, le dernier rendez-vous est à "+lastTxt+". "+proposeText(pendingProps);}
+ // jour + heure précis
+ if(di!==null&&hour!==null){
+  const st=AGENDA[di].hours[hour];
+  if(st==='free'){pendingProps=[[di,hour]];chosen=[di,hour];vctx='name';
+   return "Je vérifie l'agenda… c'est disponible ! Je vous note "+slotSay(AGENDA[di],hour)+". Votre nom et votre date de naissance pour la fiche ?";}
+  pendingProps=findProposals(di,hour);
+  return "Je regarde l'agenda… "+slotSay(AGENDA[di],hour)+" est déjà pris. "+proposeText(pendingProps);}
+ // seulement une heure
+ if(hour!==null){
+  for(let i=0;i<AGENDA.length;i++){if(AGENDA[i].hours[hour]==='free'){pendingProps=[[i,hour]];
+   const alt=findProposals(null,hour).find(p=>p[0]!==i);if(alt)pendingProps.push(alt);
+   return "Je consulte l'agenda… à "+HW[hour].replace(' heures','')+" heures, j'ai "+proposeText(pendingProps).replace('Je peux vous proposer ','');}}
+  pendingProps=findProposals(null,hour);
+  return "À cette heure-là, tout est pris cette semaine. "+proposeText(pendingProps);}
+ // seulement un jour (± matin/après-midi)
+ if(di!==null){
+  let hs=freeSlotsOfDay(di,part==='am'?9:part==='pm'?15:12);
+  if(part==='am')hs=hs.filter(h=>h<12);if(part==='pm')hs=hs.filter(h=>h>=13);
+  if(hs.length){pendingProps=hs.slice(0,2).map(h=>[di,h]);
+   return "Je consulte l'agenda de "+dayLabel(AGENDA[di])+"… "+proposeText(pendingProps);}
+  pendingProps=findProposals(null,part==='am'?9:15);
+  return dayLabel(AGENDA[di]).charAt(0).toUpperCase()+dayLabel(AGENDA[di]).slice(1)+" est complet. "+proposeText(pendingProps);}
+ return "Quel jour et quelle heure vous arrangeraient ?";
 }
 
 function startCall(){if(inCall)return;inCall=true;vctx=null;
