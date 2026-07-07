@@ -53,6 +53,7 @@ a.mod{color:inherit}
 .simhead h2{font-size:17px;margin-bottom:5px}
 .simhead p{color:var(--mid);font-size:13px;line-height:1.6}
 .scenrow{display:flex;gap:9px;flex-wrap:wrap;padding:12px 16px}
+.scen.sel{border-color:var(--teal);color:var(--text);background:rgba(45,212,191,.08)}
 .scen{background:var(--chip);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:10px 15px;cursor:pointer;font-size:12.5px;font-weight:600;font-family:inherit}
 .scen:hover{border-color:var(--teal)}
 .scen.on{border-color:var(--teal);background:rgba(45,212,191,.1)}
@@ -133,6 +134,7 @@ footer b{color:var(--text)}
     <button class="tab" data-p="m3">🔄 Réactivation</button>
     <button class="tab" data-p="m4">🚨 Tri d'urgence</button>
     <button class="tab" data-p="m5">📋 Préparation consult.</button>
+    <button class="tab" data-p="m6">🗂️ Assistant admin</button>
     <button class="tab" data-p="live">🎙️ Appel live</button>
     <a class="tab" href="dashboard" target="_blank" rel="noopener">📊 Dashboard cabinet ↗</a>
   </nav>
@@ -151,6 +153,7 @@ footer b{color:var(--text)}
       <button class="mod" data-go="m3"><div class="mi">🔄</div><div class="mn">Module 3 · Réactivation patients</div><div class="md">Recontacte les patients sans contrôle depuis 12 mois. Le module qui génère du chiffre visible et justifie l'abonnement.</div><span class="mb">Lancer la campagne →</span></button>
       <button class="mod" data-go="m4"><div class="mi">🚨</div><div class="mn">Module 4 · Tri d'urgence <small>OPTION</small></div><div class="md">Qualifie la douleur (aiguë / modérée) et attribue un créneau prioritaire — sans jamais poser de diagnostic.</div><span class="mb">Simuler un appel urgent →</span></button>
       <button class="mod" data-go="m5"><div class="mi">📋</div><div class="mn">Module 5 · Préparation de consultation <small>OPTION</small></div><div class="md">Contacte le patient par SMS/WhatsApp 24-48h avant le RDV, recueille motif, traitements et allergies — et remet au praticien une synthèse de 6 lignes. Collecte sans jamais interpréter.</div><span class="mb">Vivre la conversation patient →</span></button>
+      <button class="mod" data-go="m6"><div class="mi">🗂️</div><div class="mn">Module 6 · Assistant administratif <small>OPTION</small></div><div class="md">Traite les demandes non médicales par téléphone, e-mail et formulaire : horaires, documents, attestations, facturation de base. Tout le médical part à l'équipe.</div><span class="mb">Poser une question →</span></button>
       <a class="mod" href="dashboard" target="_blank" rel="noopener"><div class="mi">📊</div><div class="mn">Dashboard cabinet · la preuve chiffrée</div><div class="md">Valeur générée en francs, appels hors horaires captés, no-shows évités, patients réactivés — le rapport mensuel que reçoit le cabinet.</div><span class="mb">Ouvrir le dashboard ↗</span></a>
     </div>
   </div>
@@ -229,6 +232,25 @@ footer b{color:var(--text)}
     <p class="note">Garde-fous : aucun commentaire médical (ni rassurant ni alarmant), signal d'urgence → 144 + notification cabinet, questions médicales notées pour le praticien, chaque question est facultative.</p>
   </div>
 
+  <!-- ============ MODULE 6 : ASSISTANT ADMINISTRATIF ============ -->
+  <div class="panel" id="p-m6">
+    <div class="simhead"><h2>🗂️ Module 6 — Assistant administratif (option)</h2>
+    <p>Il décharge le secrétariat de tout le non-médical — <b>téléphone, e-mail et formulaire du site</b> : horaires, accès, documents à apporter, attestations, facturation de base. Dès que c'est médical, un litige ou la demande d'un tiers : <b>il transmet à l'équipe, sans improviser.</b> Posez vos questions comme un patient.</p></div>
+    <div class="scenrow" style="padding-bottom:2px">
+      <span style="font-size:11px;color:var(--dim);align-self:center;font-weight:700;letter-spacing:.06em">CANAL :</span>
+      <button class="scen sel" data-ch="📞 Téléphone">📞 Téléphone</button>
+      <button class="scen" data-ch="✉️ E-mail">✉️ E-mail</button>
+      <button class="scen" data-ch="📝 Formulaire du site">📝 Formulaire</button>
+    </div>
+    <div class="smsbox" id="admbox" style="max-height:44vh;overflow-y:auto"></div>
+    <div class="scenrow" id="admsuggest"></div>
+    <div style="display:flex;gap:8px;padding:4px 16px 8px">
+      <input id="admIn" type="text" placeholder="Posez votre question comme un patient…" style="flex:1;background:var(--chip);border:1px solid var(--border);border-radius:12px;padding:11px 14px;color:var(--text);font-size:13px;font-family:inherit;outline:none">
+      <button class="gen" id="admSendBtn" style="margin:0;padding:11px 16px">➤</button>
+    </div>
+    <p class="note">Garde-fous : aucune information patient sans vérification d'identité (nom + date de naissance), réponses générales uniquement sur la LAMal — jamais de promesse de prise en charge —, médical / litiges / demandes de tiers → transmis à l'équipe.</p>
+  </div>
+
   <!-- ============ APPEL LIVE ============ -->
   <div class="panel" id="p-live">
     <div class="simhead"><h2>🎙️ Appel live — parlez à l'agent</h2>
@@ -268,7 +290,8 @@ footer b{color:var(--text)}
 const tabs=document.querySelectorAll('.tab'),panels=document.querySelectorAll('.panel');
 function goTab(n){tabs.forEach(x=>x.classList.remove('on'));panels.forEach(p=>p.classList.remove('on'));
  document.querySelector(`.tab[data-p="${n}"]`).classList.add('on');document.getElementById('p-'+n).classList.add('on');
- if(n==='m5'&&typeof prepStart==='function'&&prepStep<0)prepStart();}
+ if(n==='m5'&&typeof prepStart==='function'&&prepStep<0)prepStart();
+ if(n==='m6'&&typeof admStart==='function'&&!admStarted)admStart();}
 tabs.forEach(t=>{if(t.dataset.p)t.onclick=()=>goTab(t.dataset.p);});
 document.querySelectorAll('.mod').forEach(m=>{if(m.dataset.go)m.onclick=()=>goTab(m.dataset.go);});
 document.getElementById('theme').onclick=e=>{document.body.classList.toggle('light');
@@ -465,6 +488,109 @@ function prepSend(){const t=prepin.value.trim();if(!t||prepDone||prepStep<0)retu
  prepAns[prepStep]=t;prepStep++;prepAsk();}
 document.getElementById('prepsend').onclick=prepSend;
 prepin.addEventListener('keydown',e=>{if(e.key==='Enter')prepSend();});
+
+/* ===================================================== */
+/* ======== MODULE 6 : ASSISTANT ADMINISTRATIF ========= */
+/* ===================================================== */
+const admbox=document.getElementById('admbox'),admIn=document.getElementById('admIn'),
+      admsug=document.getElementById('admsuggest');
+let admStarted=false,admMode=null,admIdentTries=0;
+
+const ADMSUG=[
+ "🕐 Vous êtes ouverts le samedi ?",
+ "🅿️ Il y a un parking à proximité ?",
+ "🧾 Quels documents pour un premier rendez-vous ?",
+ "📄 Il me faut une attestation de soins pour mon assurance",
+ "💰 La LAMal rembourse-t-elle mon détartrage ?",
+ "😠 Ma facture est trop élevée, je la conteste",
+ "🕵️ Mon mari avait rendez-vous hier, est-il venu ?",
+ "🔬 Vous avez les résultats de ma radio ?"];
+
+function admMsg(w,t){const d=document.createElement('div');
+ if(w==='s'){d.className='ls';d.style.alignSelf='center';d.textContent=t;}
+ else{d.className='sms '+(w==='out'?'sout':'sin');d.textContent=t;}
+ admbox.appendChild(d);admbox.scrollTop=admbox.scrollHeight;}
+
+function admSuggest(){admsug.innerHTML='';
+ ADMSUG.forEach(s=>{const b=document.createElement('button');b.className='scen';
+  b.textContent=s;b.onclick=()=>{admIn.value=s.replace(/^[^ ]+ /,'');admSend();};admsug.appendChild(b);});}
+
+function admStart(){admStarted=true;admbox.innerHTML='';admMode=null;admIdentTries=0;
+ admMsg('s','🗂️ Assistant administratif — même agent sur les trois canaux (démo)');
+ admMsg('out',"Cabinet dentaire du Léman, bonjour ! Je suis l'assistant administratif du cabinet. Horaires, accès, documents, attestations, facturation : je peux tout traiter — et pour le médical, l'équipe prend le relais. Que puis-je faire pour vous ?");
+ admSuggest();}
+
+function admSend(){const t=admIn.value.trim();if(!t)return;admIn.value='';
+ admMsg('in',t);const m=t.toLowerCase();
+ const say=(txt,sys)=>setTimeout(()=>{admMsg('out',txt);if(sys)admMsg('s',sys);},650);
+
+ /* --- vérification d'identité en cours --- */
+ if(admMode==='ident'){
+  if(/\d/.test(m)&&/[a-zà-ÿ]{2,}/.test(m)){admMode=null;admIdentTries=0;
+   say("Merci, votre identité est vérifiée pour cette demande. ✅ Votre attestation est enregistrée : elle sera prête sous 5 jours ouvrés, à retirer au cabinet ou envoyée par courrier. Autre chose ?",
+       "📋 Demande consignée — file d'attente du secrétariat · identité vérifiée");}
+  else{admIdentTries++;
+   if(admIdentTries>1){admMode=null;admIdentTries=0;
+    say("Sans vérification d'identité, je ne peux pas traiter cette demande — c'est une règle absolue. Je note une demande de rappel : l'équipe vous recontactera aux heures d'ouverture.",
+        "↪️ Transmis à l'équipe — vérification d'identité impossible");}
+   else say("Il me faut votre nom complet ET votre date de naissance (par exemple : Marie Dupont, 12.04.1985).");}
+  return;}
+
+ /* --- demande d'un tiers sur un patient --- */
+ if(/mon mari|ma femme|mon épou|mon epou|mon fils|ma fille|mon frère|ma sœur|ma soeur|mon père|ma mère|est-il venu|est-elle venue|mon voisin|ma voisine/.test(m)){
+  say("Je ne peux donner aucune information concernant un autre patient — même à un proche. C'est une règle de confidentialité absolue. La personne concernée peut nous contacter directement, avec plaisir.",
+      "🔒 Confidentialité appliquée — aucune information divulguée (nLPD)");return;}
+
+ /* --- contestation / litige --- */
+ if(/contest|litige|trop élevée|trop elevee|trop cher|pas d'accord|pas daccord|erreur de facture|réclamation|reclamation/.test(m)){
+  say("Je comprends. Les contestations de facture sont traitées directement par l'équipe — je ne tranche pas ces questions, et c'est voulu. Je note votre demande : un collaborateur vous rappelle sous 24 h ouvrées.",
+      "↪️ Litige transmis à l'équipe — rappel sous 24 h ouvrées");return;}
+
+ /* --- médical / résultats / ordonnances --- */
+ if(/résultat|resultat|radio|ordonnance|prescription|médicament pour|medicament pour|douleur|\bmal\b|carie|diagnost|infection|traitement en cours|dossier médical|dossier medical/.test(m)){
+  say("Cela touche au médical — je n'y réponds jamais, c'est le rôle de l'équipe soignante. Je transmets votre demande : on vous recontacte aux heures d'ouverture. Puis-je vous aider pour autre chose — horaires, documents, attestations ?",
+      "↪️ Transmis à l'équipe soignante — rappel programmé");return;}
+
+ /* --- LAMal / remboursements --- */
+ if(/lamal|rembours|assurance de base|complémentaire|complementaire|prise en charge|couvre/.test(m)){
+  say("En Suisse, l'assurance de base (LAMal) ne couvre pas les soins dentaires courants ; les complémentaires dentaires remboursent selon votre contrat. Votre assureur vous confirmera la couverture exacte — je ne peux pas vous promettre une prise en charge. Souhaitez-vous une attestation de soins à lui transmettre ?");return;}
+
+ /* --- attestation / certificat / copie --- */
+ if(/attestation|certificat|copie|justificatif|document.*(assurance|employeur)|papier pour/.test(m)){
+  admMode='ident';
+  say("Avec plaisir. Pour toute demande liée à votre dossier, je dois d'abord vérifier votre identité : votre nom complet et votre date de naissance, s'il vous plaît ?",
+      "🔐 Vérification d'identité requise — règle absolue avant tout accès au dossier");return;}
+
+ /* --- documents à apporter --- */
+ if(/document|apporter|premier rendez|première visite|premiere visite|carte d'assurance|carte dassurance/.test(m)){
+  say("Pour un premier rendez-vous, apportez : votre carte d'assurance, une pièce d'identité, la liste de vos médicaments actuels et, si vous en avez, vos anciennes radiographies. Rien d'autre n'est nécessaire.");return;}
+
+ /* --- horaires --- */
+ if(/horaire|ouvert|ouverture|samedi|dimanche|quelle heure|fermé|ferme\b/.test(m)){
+  say("Le cabinet est ouvert du lundi au vendredi, de 8 h à 18 h, et le samedi matin sur rendez-vous. Moi, je réponds 24 h/24 — je peux enregistrer votre demande à toute heure.");return;}
+
+ /* --- adresse / accès / parking --- */
+ if(/parking|adresse|accès|acces|venir|métro|metro|bus|où êtes|ou etes|situé|situe/.test(m)){
+  say("Nous sommes Rue du Lac 12, 1003 Lausanne — métro M2 arrêt Ouchy, parking public à 100 mètres. L'accès est de plain-pied, adapté aux poussettes et fauteuils roulants.");return;}
+
+ /* --- facturation générale --- */
+ if(/facture|facturation|payer|paiement|tiers garant|tiers payant|twint|virement/.test(m)){
+  say("Les factures sont envoyées par e-mail ou courrier après chaque traitement, en tiers garant : vous réglez, puis votre complémentaire vous rembourse selon votre contrat. Paiement par virement, carte ou TWINT. Un devis est toujours établi avant tout traitement.");return;}
+
+ /* --- politesse --- */
+ if(/merci|parfait|super|au revoir|bonne journée|bonne journee/.test(m)){
+  say("Avec plaisir ! Belle journée, et à bientôt au cabinet du Léman.");return;}
+
+ /* --- ambigu : règle absolue --- */
+ say("Je préfère que l'équipe vous confirme cela — je note votre demande de rappel. À quel numéro peut-on vous joindre ?",
+     "📞 Demande de rappel notée — traitée aux heures d'ouverture");}
+
+document.getElementById('admSendBtn').onclick=admSend;
+admIn.addEventListener('keydown',e=>{if(e.key==='Enter')admSend();});
+document.querySelectorAll('#p-m6 .scen[data-ch]').forEach(b=>{b.onclick=()=>{
+ document.querySelectorAll('#p-m6 .scen[data-ch]').forEach(x=>x.classList.remove('sel'));
+ b.classList.add('sel');
+ admMsg('s','Canal : '+b.dataset.ch+' — même agent, mêmes règles');};});
 
 /* ===================================================== */
 /* ============ APPEL LIVE (voix réelle) =============== */
