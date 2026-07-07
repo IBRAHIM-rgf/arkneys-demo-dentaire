@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cabinet dentaire du Léman — Agent vocal · Démo Arkneys</title>
+<style>
+:root{
+  --bg:#0a0f16;--bg2:#0d1420;--card:#111a28;--teal:#2dd4bf;--cyan-l:#67e8f9;--green:#4ade80;
+  --text:#e7eef7;--mid:rgba(231,238,247,.72);--dim:rgba(231,238,247,.45);
+  --border:rgba(125,211,252,.16);--chip:#131f30;--caller:#1e293b;--agent:#0e3a44;
+  --amber:#fbbf24;--red:#f87171;
+}
+body.light{--bg:#f2f6fa;--bg2:#e9eff6;--card:#ffffff;--text:#0e1f3a;--mid:rgba(14,31,58,.75);
+ --dim:rgba(14,31,58,.45);--border:rgba(14,116,144,.18);--chip:#e8f0f7;--caller:#dbe6f0;--agent:#d5eef2}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:radial-gradient(1100px 500px at 75% -10%,rgba(45,212,191,.08),transparent),var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
+.app{max-width:780px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0;z-index:20}
+.htile{width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg,#5eead4,#0e7490);display:flex;align-items:center;justify-content:center;font-size:23px;position:relative;flex-shrink:0}
+.htile::after{content:"";position:absolute;bottom:2px;right:2px;width:10px;height:10px;border-radius:50%;background:var(--green);border:2px solid var(--bg2)}
+.hinfo{flex:1;min-width:0}
+.hinfo .nm{font-weight:800;font-size:16px;line-height:1.15}
+.hinfo .st{font-size:11.5px;color:var(--green);font-weight:600}
+.hinfo .lg{font-size:10.5px;color:var(--dim);letter-spacing:.05em}
+.hbtn{background:var(--chip);border:1px solid var(--border);color:var(--text);border-radius:11px;padding:8px 10px;cursor:pointer;font-size:13px;font-family:inherit}
+nav{display:flex;flex-wrap:wrap;gap:7px;padding:12px 14px;justify-content:center;border-bottom:1px solid var(--border);background:var(--bg2)}
+.tab{background:transparent;border:1px solid transparent;color:var(--mid);border-radius:999px;padding:8px 12px;cursor:pointer;font-size:12.5px;font-weight:600;font-family:inherit}
+.tab:hover{color:var(--text)}
+.tab.on{border-color:var(--teal);color:var(--text);background:rgba(45,212,191,.08)}
+.panel{display:none;flex:1;flex-direction:column;padding-bottom:20px}
+.panel.on{display:flex}
+/* accueil */
+.hero{text-align:center;padding:32px 22px 8px}
+.hero .big{width:84px;height:84px;border-radius:22px;background:linear-gradient(135deg,#5eead4,#0e7490);display:inline-flex;align-items:center;justify-content:center;font-size:42px;margin-bottom:15px}
+.hero h1{font-size:24px;margin-bottom:10px}
+.hero p{color:var(--mid);font-size:14px;line-height:1.65;max-width:560px;margin:0 auto 18px}
+.integ{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:8px}
+.integ span{font-size:11px;font-weight:700;letter-spacing:.05em;background:var(--chip);border:1px solid var(--border);border-radius:999px;padding:6px 13px;color:var(--mid)}
+.mods{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;padding:16px}
+.mod{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;cursor:pointer;text-align:left;font-family:inherit;color:var(--text);transition:.15s}
+.mod:hover{border-color:var(--teal);transform:translateY(-2px)}
+.mod .mi{font-size:24px;margin-bottom:9px}
+.mod .mn{font-weight:800;font-size:14.5px;margin-bottom:6px}
+.mod .mn small{font-weight:600;color:var(--dim);font-size:10px;letter-spacing:.06em}
+.mod .md{font-size:12.5px;color:var(--mid);line-height:1.55}
+.mod .mb{display:inline-block;margin-top:10px;font-size:11px;font-weight:800;color:var(--teal)}
+/* call sim */
+.simhead{padding:18px 16px 6px}
+.simhead h2{font-size:17px;margin-bottom:5px}
+.simhead p{color:var(--mid);font-size:13px;line-height:1.6}
+.scenrow{display:flex;gap:9px;flex-wrap:wrap;padding:12px 16px}
+.scen{background:var(--chip);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:10px 15px;cursor:pointer;font-size:12.5px;font-weight:600;font-family:inherit}
+.scen:hover{border-color:var(--teal)}
+.scen.on{border-color:var(--teal);background:rgba(45,212,191,.1)}
+.callbox{margin:6px 16px;background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden}
+.callbar{display:flex;align-items:center;gap:11px;padding:13px 16px;background:rgba(74,222,128,.08);border-bottom:1px solid var(--border)}
+.callbar .cav{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#5eead4,#0e7490);display:flex;align-items:center;justify-content:center;font-size:17px}
+.callbar .cn{font-weight:700;font-size:13.5px}
+.callbar .cs{font-size:11px;color:var(--green)}
+.callbar .dur{margin-left:auto;font-variant-numeric:tabular-nums;font-size:13px;color:var(--green);font-weight:700}
+.trans{padding:14px;display:flex;flex-direction:column;gap:9px;min-height:230px;max-height:46vh;overflow-y:auto}
+.line{max-width:88%;padding:9px 12px;border-radius:13px;font-size:13px;line-height:1.5;animation:pop .25s ease;white-space:pre-wrap}
+.line .lw{font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;opacity:.55;margin-bottom:2px}
+.lc{align-self:flex-end;background:var(--caller);border-bottom-right-radius:4px}
+.la{align-self:flex-start;background:var(--agent);border:1px solid var(--border);border-bottom-left-radius:4px}
+.ls{align-self:center;font-size:11px;color:var(--teal);background:rgba(45,212,191,.07);border:1px dashed rgba(45,212,191,.4);border-radius:9px;padding:7px 12px;text-align:center;max-width:94%}
+@keyframes pop{from{opacity:0;transform:translateY(5px)}to{opacity:1}}
+/* sms */
+.smsbox{margin:6px 16px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:8px;min-height:200px}
+.sms{max-width:82%;padding:9px 12px;border-radius:13px;font-size:12.5px;line-height:1.5;animation:pop .25s ease;white-space:pre-wrap}
+.sout{align-self:flex-start;background:var(--agent);border:1px solid var(--border)}
+.sin{align-self:flex-end;background:var(--caller)}
+.sms .st2{font-size:9.5px;opacity:.5;margin-top:3px}
+/* réactivation */
+.rlist{margin:6px 16px;display:flex;flex-direction:column;gap:8px}
+.rpat{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:11px 14px;display:flex;align-items:center;gap:11px;font-size:13px}
+.rpat .rp{flex:1}
+.rpat .rd{color:var(--dim);font-size:11px}
+.rpat .rs{font-size:11px;font-weight:700;color:var(--dim);white-space:nowrap}
+.rpat .rs.sent{color:var(--amber)}
+.rpat .rs.ok{color:var(--green)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;padding:12px 16px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:13px;text-align:center}
+.stat .n{font-size:21px;font-weight:800;color:var(--teal);font-variant-numeric:tabular-nums}
+.stat .l{font-size:10.5px;color:var(--dim);margin-top:3px;line-height:1.4}
+.gen{background:linear-gradient(135deg,#5eead4,#0e7490);color:#06222b;border:none;border-radius:13px;padding:13px 20px;font-weight:800;font-size:13.5px;cursor:pointer;font-family:inherit;margin:8px 16px}
+.note{color:var(--dim);font-size:11.5px;line-height:1.6;padding:4px 18px}
+.urgcard{margin:6px 16px;border-radius:14px;padding:14px 16px;font-size:13px;line-height:1.6;animation:pop .3s ease;display:none}
+.urgcard.show{display:block}
+.urg-a{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.4)}
+.urg-m{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.4)}
+.urgcard b{display:block;margin-bottom:5px}
+footer{text-align:center;color:var(--dim);font-size:12px;padding:14px 10px;border-top:1px solid var(--border);margin-top:auto}
+footer b{color:var(--text)}
+.demo-note{position:fixed;top:10px;right:10px;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#06222b;background:#a5f3fc;font-weight:800;padding:5px 10px;border-radius:999px;z-index:50;opacity:.92}
+</style>
+</head>
+<body>
+<div class="demo-note">Démo Arkneys</div>
+<div class="app">
+  <header>
+    <div class="htile">🦷</div>
+    <div class="hinfo">
+      <div class="nm">Cabinet dentaire du Léman</div>
+      <div class="st">Agent vocal · répond à 100% des appels</div>
+      <div class="lg">FR·EN · Zawin · Vitodent · OneDoc</div>
+    </div>
+    <button class="hbtn" id="theme" title="Thème">☀️</button>
+  </header>
+
+  <nav>
+    <button class="tab on" data-p="home">🏠 Vue d'ensemble</button>
+    <button class="tab" data-p="m1">📞 Réceptionniste vocal</button>
+    <button class="tab" data-p="m2">💬 Rappels SMS</button>
+    <button class="tab" data-p="m3">🔄 Réactivation</button>
+    <button class="tab" data-p="m4">🚨 Tri d'urgence</button>
+    <button class="tab" data-p="live">🎙️ Appel live</button>
+  </nav>
+
+  <!-- ============ ACCUEIL ============ -->
+  <div class="panel on" id="p-home">
+    <div class="hero">
+      <div class="big">🦷</div>
+      <h1>L'agent vocal qui décroche<br>quand le cabinet ne peut pas.</h1>
+      <p>Hors horaires, pendant les soins, en débordement : l'agent répond au téléphone du cabinet, prend les rendez-vous directement dans l'agenda, gère les annulations et détecte les urgences. <b>Jamais de diagnostic — le médical reste au praticien.</b></p>
+      <div class="integ"><span>ZAWIN</span><span>VITODENT</span><span>ONEDOC</span><span>nLPD · hébergé en Suisse</span></div>
+    </div>
+    <div class="mods">
+      <button class="mod" data-go="m1"><div class="mi">📞</div><div class="mn">Module 1 · Réceptionniste vocal FR/EN <small>OFFRE D'ENTRÉE</small></div><div class="md">Répond à 100% des appels, prend les rendez-vous directement dans l'agenda du cabinet.</div><span class="mb">Écouter un appel →</span></button>
+      <button class="mod" data-go="m2"><div class="mi">💬</div><div class="mn">Module 2 · Rappels & confirmations SMS</div><div class="md">Confirmation automatique des RDV, relance des patients non confirmés. Réduit les no-shows de 50 à 70%.</div><span class="mb">Voir la séquence →</span></button>
+      <button class="mod" data-go="m3"><div class="mi">🔄</div><div class="mn">Module 3 · Réactivation patients</div><div class="md">Recontacte les patients sans contrôle depuis 12 mois. Le module qui génère du chiffre visible et justifie l'abonnement.</div><span class="mb">Lancer la campagne →</span></button>
+      <button class="mod" data-go="m4"><div class="mi">🚨</div><div class="mn">Module 4 · Tri d'urgence <small>OPTION</small></div><div class="md">Qualifie la douleur (aiguë / modérée) et attribue un créneau prioritaire — sans jamais poser de diagnostic.</div><span class="mb">Simuler un appel urgent →</span></button>
+    </div>
+  </div>
+
+  <!-- ============ MODULE 1 ============ -->
+  <div class="panel" id="p-m1">
+    <div class="simhead"><h2>📞 Module 1 — Réceptionniste vocal FR/EN</h2>
+    <p>Choisis un scénario : l'appel se joue en direct. À la fin, le rendez-vous est <b>écrit dans l'agenda du cabinet</b> (Zawin, Vitodent ou OneDoc).</p></div>
+    <div class="scenrow">
+      <button class="scen" data-c="c1">🌙 Hors horaires (22h40)</button>
+      <button class="scen" data-c="c2">🦷 Pendant les soins (débordement)</button>
+      <button class="scen" data-c="c3">🔁 Annulation + re-remplissage</button>
+      <button class="scen" data-c="c4">🇬🇧 English caller</button>
+    </div>
+    <div class="callbox">
+      <div class="callbar"><div class="cav">📞</div><div><div class="cn" id="cnum">+41 79 ··· ·· ··</div><div class="cs" id="cstate">En attente d'un scénario…</div></div><div class="dur" id="dur">00:00</div></div>
+      <div class="trans" id="trans"><div class="ls">Clique un scénario ci-dessus pour lancer la simulation d'appel.</div></div>
+    </div>
+    <p class="note">En production : voix naturelle FR/EN, détection de langue dès la première phrase, transfert à l'assistante si demande complexe. Chaque appel est journalisé (conforme nLPD).</p>
+  </div>
+
+  <!-- ============ MODULE 2 ============ -->
+  <div class="panel" id="p-m2">
+    <div class="simhead"><h2>💬 Module 2 — Rappels & confirmations SMS</h2>
+    <p>Séquence automatique autour de chaque rendez-vous : confirmation à J-3, relance si pas de réponse, rappel J-1. <b>Réduction des no-shows : 50 à 70%.</b></p></div>
+    <button class="gen" id="smsgo">▶ Lancer la séquence SMS</button>
+    <div class="smsbox" id="smsbox"><div class="ls" style="align-self:center">La conversation SMS apparaîtra ici.</div></div>
+    <div class="stats">
+      <div class="stat"><div class="n">−50/70%</div><div class="l">no-shows</div></div>
+      <div class="stat"><div class="n">CHF 150-300</div><div class="l">valeur d'un fauteuil sauvé</div></div>
+      <div class="stat"><div class="n">0 min</div><div class="l">de travail assistante</div></div>
+    </div>
+  </div>
+
+  <!-- ============ MODULE 3 ============ -->
+  <div class="panel" id="p-m3">
+    <div class="simhead"><h2>🔄 Module 3 — Réactivation patients</h2>
+    <p>L'agent repère les patients <b>sans contrôle depuis 12 mois</b> et les recontacte poliment (SMS, puis appel). Chaque retour est un contrôle + détartrage facturé — du chiffre visible, chaque mois.</p></div>
+    <button class="gen" id="reactgo">▶ Lancer la campagne de réactivation</button>
+    <div class="rlist" id="rlist"></div>
+    <div class="stats">
+      <div class="stat"><div class="n" id="rn1">0</div><div class="l">patients recontactés</div></div>
+      <div class="stat"><div class="n" id="rn2">0</div><div class="l">RDV repris</div></div>
+      <div class="stat"><div class="n" id="rn3">CHF 0</div><div class="l">chiffre généré (contrôles à CHF 180)</div></div>
+    </div>
+    <p class="note">Données 100% fictives. En production, la liste vient directement du logiciel du cabinet (Zawin/Vitodent), avec consentement patients respecté.</p>
+  </div>
+
+  <!-- ============ MODULE 4 ============ -->
+  <div class="panel" id="p-m4">
+    <div class="simhead"><h2>🚨 Module 4 — Tri d'urgence (option)</h2>
+    <p>L'agent qualifie la douleur — <b>aiguë ou modérée</b> — par des questions simples, et attribue le bon créneau. Garde-fou absolu : aucun diagnostic, aucun conseil médical. Signes graves → cabinet en priorité / 144.</p></div>
+    <div class="scenrow">
+      <button class="scen" data-u="a">😖 Douleur aiguë (nuit blanche)</button>
+      <button class="scen" data-u="m">😕 Douleur modérée (sensibilité)</button>
+    </div>
+    <div class="callbox">
+      <div class="callbar"><div class="cav">🚨</div><div><div class="cn">Appel entrant — tri d'urgence</div><div class="cs" id="ustate">Choisis un cas ci-dessus</div></div><div class="dur" id="udur">00:00</div></div>
+      <div class="trans" id="utrans"><div class="ls">La qualification se joue ici.</div></div>
+    </div>
+    <div class="urgcard urg-a" id="card-a"><b>🔴 Qualification : douleur AIGUË</b>Créneau prioritaire attribué : aujourd'hui 17h15 (plage d'urgence réservée). L'assistante est notifiée, la fiche patient est préparée dans Zawin. Consigne au patient : éviter chaud/froid, pas d'aspirine sans avis.</div>
+    <div class="urgcard urg-m" id="card-m"><b>🟡 Qualification : douleur MODÉRÉE</b>Rendez-vous sous 48h proposé : jeudi 9h40. SMS de confirmation envoyé avec consignes d'attente. Si aggravation (gonflement, fièvre) : rappeler immédiatement — l'agent re-priorisera.</div>
+  </div>
+
+  <!-- ============ APPEL LIVE ============ -->
+  <div class="panel" id="p-live">
+    <div class="simhead"><h2>🎙️ Appel live — parlez à l'agent</h2>
+    <p>Ici, ce n'est plus un script : <b>vous parlez, l'agent vous répond à voix haute.</b> Prenez un rendez-vous, annulez, décrivez une douleur — comme au téléphone. (Fonctionne dans Chrome, micro requis.)</p></div>
+    <div class="callbox" style="margin-bottom:10px">
+      <div class="callbar"><div class="cav" id="lav">📞</div><div><div class="cn">Cabinet dentaire du Léman</div><div class="cs" id="lstate">Prêt à décrocher</div></div><div class="dur" id="ldur">00:00</div></div>
+      <div style="display:flex;justify-content:center;gap:12px;padding:16px">
+        <button class="gen" id="callbtn" style="margin:0">📞 Appeler le cabinet</button>
+        <button class="gen" id="hangbtn" style="margin:0;background:rgba(248,113,113,.15);color:var(--red);border:1px solid rgba(248,113,113,.4);display:none">🔴 Raccrocher</button>
+      </div>
+      <div class="trans" id="ltrans" style="min-height:180px"><div class="ls">Clique « Appeler le cabinet », autorise le micro, puis parle après le bip visuel 🎤.</div></div>
+      <div style="display:none;gap:8px;padding:11px 14px;border-top:1px solid var(--border)" id="fallbar">
+        <input id="fbin" type="text" placeholder="(Micro indisponible) Écris ta réponse ici…" style="flex:1;background:var(--chip);border:1px solid var(--border);border-radius:12px;padding:11px 14px;color:var(--text);font-size:13px;font-family:inherit;outline:none">
+        <button class="gen" id="fbsend" style="margin:0;padding:11px 16px">➤</button>
+      </div>
+    </div>
+    <p class="note">Démo navigateur (voix du système). En production : voix naturelle premium (ElevenLabs), vrai numéro suisse, connexion directe à l'agenda Zawin/Vitodent/OneDoc, journal d'appel conforme nLPD.</p>
+  </div>
+
+  <footer>△ Propulsé par <b>Arkneys</b> — studio IA suisse 🇨🇭 · démo, données fictives · jamais de diagnostic</footer>
+</div>
+
+<script>
+/* ===== nav ===== */
+const tabs=document.querySelectorAll('.tab'),panels=document.querySelectorAll('.panel');
+function goTab(n){tabs.forEach(x=>x.classList.remove('on'));panels.forEach(p=>p.classList.remove('on'));
+ document.querySelector(`.tab[data-p="${n}"]`).classList.add('on');document.getElementById('p-'+n).classList.add('on');}
+tabs.forEach(t=>t.onclick=()=>goTab(t.dataset.p));
+document.querySelectorAll('.mod').forEach(m=>m.onclick=()=>goTab(m.dataset.go));
+document.getElementById('theme').onclick=e=>{document.body.classList.toggle('light');
+ e.target.textContent=document.body.classList.contains('light')?'🌙':'☀️';};
+
+/* ===== moteur de transcription ===== */
+let timers=[];
+function clearTimers(){timers.forEach(t=>clearTimeout(t));timers=[];}
+function playScript(lines,box,durEl,stateEl,agentName){
+ clearTimers();box.innerHTML='';let t=0,sec=0;
+ if(durEl){durEl.textContent='00:00';const dt=setInterval(()=>{sec++;durEl.textContent=`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;},1000);timers.push(dt);
+  timers.push(setTimeout(()=>clearInterval(dt),lines.length*1600+3000));}
+ if(stateEl)stateEl.textContent='📞 Appel en cours…';
+ lines.forEach((l,i)=>{t+=l.d||1500;
+  timers.push(setTimeout(()=>{
+   const d=document.createElement('div');
+   if(l.w==='s'){d.className='ls';d.textContent=l.t;}
+   else{d.className='line '+(l.w==='c'?'lc':'la');
+    d.innerHTML=`<div class="lw">${l.w==='c'?'Patient':agentName||'Agent vocal'}</div>`+l.t.replace(/</g,'&lt;');}
+   box.appendChild(d);box.scrollTop=box.scrollHeight;
+   if(i===lines.length-1&&stateEl)stateEl.textContent='✅ Appel terminé';
+  },t));});
+}
+
+/* ===== module 1 : appels ===== */
+const CALLS={
+ c1:[{w:'s',t:'🌙 22h40 — cabinet fermé. Renvoi automatique vers l\'agent vocal.',d:400},
+  {w:'a',t:"Cabinet dentaire du Léman, bonsoir ! Le cabinet est fermé, mais je peux prendre votre rendez-vous tout de suite. Que puis-je faire pour vous ?"},
+  {w:'c',t:"Bonsoir… oui, je voudrais un rendez-vous pour un contrôle, mais je travaille en journée, c'est compliqué d'appeler."},
+  {w:'a',t:"Aucun souci, c'est exactement pour ça que je suis là. J'ai jeudi 17h30 ou samedi 9h00 — lequel vous arrange ?"},
+  {w:'c',t:"Samedi 9h, parfait."},
+  {w:'a',t:"C'est réservé : samedi 12 juillet, 9h00, contrôle avec la Dre Favre. Vous recevez un SMS de confirmation immédiat. Votre nom et votre date de naissance pour la fiche ?"},
+  {w:'c',t:"Martin Rochat, 14 mars 1985."},
+  {w:'a',t:"Merci M. Rochat, tout est en ordre. À samedi, excellente soirée !"},
+  {w:'s',t:'✅ RDV écrit dans l\'agenda du cabinet (Zawin) · SMS de confirmation envoyé · fiche patient créée',d:1800}],
+ c2:[{w:'s',t:'🦷 14h15 — l\'assistante est au fauteuil. 3e sonnerie : l\'agent décroche (débordement).',d:400},
+  {w:'a',t:"Cabinet dentaire du Léman, bonjour ! Toute l'équipe est en soins — je suis l'assistant vocal du cabinet et je peux tout gérer. Que puis-je faire pour vous ?"},
+  {w:'c',t:"Bonjour, c'est pour déplacer mon rendez-vous de vendredi, un imprévu."},
+  {w:'a',t:"Bien sûr. Votre rendez-vous de vendredi 10h20 peut être déplacé à mardi 8h45 ou mercredi 16h10. Une préférence ?"},
+  {w:'c',t:"Mercredi 16h10."},
+  {w:'a',t:"C'est fait ! Vendredi est libéré, mercredi 16h10 confirmé — vous recevez le SMS à l'instant. Belle journée !"},
+  {w:'s',t:'✅ Agenda mis à jour · créneau libéré proposé à la liste d\'attente · l\'assistante n\'a pas quitté le fauteuil',d:1800}],
+ c3:[{w:'s',t:'🔁 9h05 — annulation pour cet après-midi.',d:400},
+  {w:'a',t:"Cabinet dentaire du Léman, bonjour !"},
+  {w:'c',t:"Bonjour, je dois annuler mon rendez-vous de 15h, je suis malade."},
+  {w:'a',t:"Prompt rétablissement ! C'est noté, votre rendez-vous de 15h est annulé. Je vous propose déjà de le reporter : mardi prochain 15h ou jeudi 11h20 ?"},
+  {w:'c',t:"Mardi 15h."},
+  {w:'a',t:"Parfait, mardi 15h confirmé. Soignez-vous bien !"},
+  {w:'s',t:'⚡ Créneau de 15h remis en jeu : SMS envoyé aux 4 patients de la liste d\'attente…',d:1600},
+  {w:'s',t:'✅ 9h11 — Mme Perret a pris le créneau de 15h. Fauteuil plein, zéro trou dans le planning.',d:2200}],
+ c4:[{w:'s',t:'🇬🇧 Caller speaks English — the agent switches instantly.',d:400},
+  {w:'a',t:"Cabinet dentaire du Léman, good morning! How can I help you?"},
+  {w:'c',t:"Hi! I'm new in Lausanne — do you take new patients? I'd need a cleaning."},
+  {w:'a',t:"Welcome to Lausanne! Yes, we do. For a cleaning with our hygienist, I have Tuesday 10:30 or Thursday 16:00 — which works best?"},
+  {w:'c',t:"Tuesday 10:30, please."},
+  {w:'a',t:"Booked! Tuesday 14 July, 10:30. May I have your name and date of birth for your patient file?"},
+  {w:'c',t:"Sarah Mitchell, 2 June 1990."},
+  {w:'a',t:"Thank you Sarah, you'll receive a confirmation SMS right away. See you Tuesday!"},
+  {w:'s',t:'✅ New patient created in Vitodent · appointment booked · confirmation SMS sent',d:1800}],
+};
+document.querySelectorAll('#p-m1 .scen').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('#p-m1 .scen').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+ document.getElementById('cnum').textContent='+41 79 '+Math.floor(100+Math.random()*899)+' '+Math.floor(10+Math.random()*89)+' '+Math.floor(10+Math.random()*89);
+ playScript(CALLS[b.dataset.c],document.getElementById('trans'),document.getElementById('dur'),document.getElementById('cstate'));});
+
+/* ===== module 2 : sms ===== */
+const SMS=[
+ {w:'out',t:"Cabinet du Léman : Bonjour M. Rochat, rappel de votre RDV jeudi 10 juillet à 14h30. Répondez OUI pour confirmer, NON pour déplacer.",ts:"J-3 · 10:00"},
+ {w:'s',t:"⏳ 24h sans réponse — relance automatique",d:2200},
+ {w:'out',t:"Cabinet du Léman : M. Rochat, merci de confirmer votre RDV de jeudi 14h30 d'un simple OUI — sinon le créneau sera proposé à un autre patient.",ts:"J-2 · 10:00"},
+ {w:'in',t:"OUI",ts:"J-2 · 12:47"},
+ {w:'out',t:"Merci, c'est confirmé ✅ À jeudi ! Petit rappel : Rue du Lac 12, parking à 100 m.",ts:"J-2 · 12:47"},
+ {w:'out',t:"Cabinet du Léman : à demain 14h30 ! En cas d'empêchement, répondez à ce message.",ts:"J-1 · 17:00"},
+ {w:'s',t:"✅ Patient confirmé deux fois — probabilité de no-show quasi nulle. Zéro minute d'assistante utilisée.",d:2000},
+];
+document.getElementById('smsgo').onclick=()=>{
+ const box=document.getElementById('smsbox');box.innerHTML='';clearTimers();let t=0;
+ SMS.forEach(m=>{t+=m.d||1700;
+  timers.push(setTimeout(()=>{
+   const d=document.createElement('div');
+   if(m.w==='s'){d.className='ls';d.style.alignSelf='center';d.textContent=m.t;}
+   else{d.className='sms '+(m.w==='out'?'sout':'sin');d.innerHTML=m.t.replace(/</g,'&lt;')+`<div class="st2">${m.ts}</div>`;}
+   box.appendChild(d);box.scrollTop=box.scrollHeight;},t));});
+};
+
+/* ===== module 3 : réactivation ===== */
+const PATIENTS=[
+ ["Mme Claire Bonvin","dernier contrôle : mai 2025 (14 mois)"],
+ ["M. Luca Ferrari","dernier contrôle : avril 2025 (15 mois)"],
+ ["Mme Anna Schmid","dernier contrôle : juin 2025 (13 mois)"],
+ ["M. Pierre Vuille","dernier contrôle : mars 2025 (16 mois)"],
+ ["Mme Sofia Costa","dernier contrôle : juin 2025 (13 mois)"],
+];
+const rlist=document.getElementById('rlist');
+PATIENTS.forEach((p,i)=>{const d=document.createElement('div');d.className='rpat';d.id='pat'+i;
+ d.innerHTML=`<div class="rp"><b>${p[0]}</b><div class="rd">${p[1]}</div></div><div class="rs">en attente</div>`;rlist.appendChild(d);});
+document.getElementById('reactgo').onclick=()=>{
+ clearTimers();let sent=0,booked=0;const results=[true,false,true,true,false];
+ PATIENTS.forEach((p,i)=>{
+  timers.push(setTimeout(()=>{const el=document.querySelector('#pat'+i+' .rs');el.textContent='📤 SMS envoyé';el.className='rs sent';
+   sent++;document.getElementById('rn1').textContent=sent;},800+i*900));
+  timers.push(setTimeout(()=>{const el=document.querySelector('#pat'+i+' .rs');
+   if(results[i]){el.textContent='✅ RDV pris';el.className='rs ok';booked++;
+    document.getElementById('rn2').textContent=booked;
+    document.getElementById('rn3').textContent='CHF '+(booked*180);}
+   else{el.textContent='☎️ rappel prévu J+7';el.className='rs';}},2600+i*1300));
+ });};
+
+/* ===== module 4 : urgence ===== */
+const URG={
+ a:[{w:'s',t:'🚨 7h55 — avant ouverture. Détection de mots-clés de douleur.',d:400},
+  {w:'a',t:"Cabinet dentaire du Léman, bonjour. Je vous écoute."},
+  {w:'c',t:"J'ai une rage de dents terrible, je n'ai pas dormi de la nuit…"},
+  {w:'a',t:"Je suis désolé, on va vous prendre en charge rapidement. Deux questions simples : avez-vous le visage gonflé, de la fièvre, ou du mal à avaler ?"},
+  {w:'c',t:"Non, pas de gonflement, juste cette douleur qui lance."},
+  {w:'a',t:"D'accord. Sur dix, la douleur se situe où ?"},
+  {w:'c',t:"Huit, facile."},
+  {w:'a',t:"C'est noté — je vous réserve le créneau d'urgence d'aujourd'hui, 17h15. D'ici là, évitez le chaud et le froid sur la dent. Si un gonflement ou de la fièvre apparaît, rappelez immédiatement. (Je ne pose pas de diagnostic — le Dr vous examinera.)"},
+  {w:'s',t:'🔴 Douleur qualifiée AIGUË (8/10, nocturne) → créneau prioritaire attribué',d:1800}],
+ m:[{w:'s',t:'😕 11h20 — pendant les soins.',d:400},
+  {w:'a',t:"Cabinet dentaire du Léman, bonjour !"},
+  {w:'c',t:"Bonjour, j'ai une dent sensible au froid depuis quelques jours, ce n'est pas insupportable mais ça m'inquiète."},
+  {w:'a',t:"Vous faites bien d'appeler. Est-ce que la douleur vous réveille la nuit, ou y a-t-il un gonflement ?"},
+  {w:'c',t:"Non non, rien de tout ça, juste au froid."},
+  {w:'a',t:"Très bien. Ce n'est pas une urgence vitale, mais il ne faut pas laisser traîner : je vous propose jeudi 9h40, dans les 48 heures. Ça vous va ?"},
+  {w:'c',t:"Oui parfait, merci."},
+  {w:'a',t:"Réservé ! Si ça s'aggrave d'ici là — douleur la nuit, gonflement — rappelez, je vous ferai passer en priorité."},
+  {w:'s',t:'🟡 Douleur qualifiée MODÉRÉE → RDV sous 48h · consignes envoyées par SMS',d:1800}],
+};
+document.querySelectorAll('#p-m4 .scen').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('#p-m4 .scen').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+ document.getElementById('card-a').classList.remove('show');document.getElementById('card-m').classList.remove('show');
+ playScript(URG[b.dataset.u],document.getElementById('utrans'),document.getElementById('udur'),document.getElementById('ustate'));
+ timers.push(setTimeout(()=>{document.getElementById('card-'+b.dataset.u).classList.add('show');},URG[b.dataset.u].length*1600+1200));});
+
+/* ===================================================== */
+/* ============ APPEL LIVE (voix réelle) =============== */
+/* ===================================================== */
+const ltrans=document.getElementById('ltrans'),lstate=document.getElementById('lstate'),
+      ldur=document.getElementById('ldur'),lav=document.getElementById('lav'),
+      callbtn=document.getElementById('callbtn'),hangbtn=document.getElementById('hangbtn'),
+      fallbar=document.getElementById('fallbar'),fbin=document.getElementById('fbin');
+let inCall=false,rec=null,callSec=0,callTimer=null,vctx=null,frVoice=null;
+
+function pickVoice(){const vs=speechSynthesis.getVoices();
+ frVoice=vs.find(v=>/fr[-_]CH/i.test(v.lang))||vs.find(v=>/fr[-_]FR/i.test(v.lang)&&/Google|Amélie|Thomas|Audrey/i.test(v.name))||vs.find(v=>/^fr/i.test(v.lang))||null;}
+if('speechSynthesis' in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}
+
+function lline(w,t){const d=document.createElement('div');
+ if(w==='s'){d.className='ls';d.textContent=t;}
+ else{d.className='line '+(w==='c'?'lc':'la');
+  d.innerHTML=`<div class="lw">${w==='c'?'Vous':'Agent vocal'}</div>`+t.replace(/</g,'&lt;');}
+ ltrans.appendChild(d);ltrans.scrollTop=ltrans.scrollHeight;}
+
+function speak(t,then){lline('a',t);
+ if(!('speechSynthesis' in window)){if(then)then();return;}
+ speechSynthesis.cancel();
+ const u=new SpeechSynthesisUtterance(t.replace(/[🎤📞✅🔴🟡]/g,''));
+ if(frVoice)u.voice=frVoice;u.lang=frVoice?frVoice.lang:'fr-FR';u.rate=1.04;u.pitch=1.0;
+ lav.textContent='🔊';lstate.textContent='L\'agent parle…';
+ u.onend=()=>{lav.textContent='📞';if(inCall&&then)then();};
+ u.onerror=()=>{if(inCall&&then)then();};
+ speechSynthesis.speak(u);}
+
+function listen(){if(!inCall)return;
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){fallbar.style.display='flex';lstate.textContent='🎤 indisponible — répondez par écrit';fbin.focus();return;}
+ rec=new SR();rec.lang='fr-CH';rec.interimResults=false;rec.maxAlternatives=1;
+ lstate.textContent='🎤 À vous — parlez…';lav.textContent='🎤';
+ rec.onresult=e=>{const t=e.results[0][0].transcript;lline('c',t);handleVoice(t);};
+ rec.onerror=e=>{if(!inCall)return;
+  if(e.error==='not-allowed'){fallbar.style.display='flex';lstate.textContent='Micro refusé — répondez par écrit';}
+  else if(e.error==='no-speech'){speak("Je vous écoute — n'hésitez pas à parler après le signal.",listen);}
+  else{fallbar.style.display='flex';lstate.textContent='Micro indisponible — répondez par écrit';}};
+ try{rec.start();}catch(err){fallbar.style.display='flex';}}
+
+document.getElementById('fbsend').onclick=()=>{const t=fbin.value.trim();if(!t||!inCall)return;
+ fbin.value='';lline('c',t);handleVoice(t);};
+fbin.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('fbsend').click();});
+
+/* ---- cerveau vocal (phrases courtes, orientées téléphone) ---- */
+function handleVoice(msg){
+ const m=msg.toLowerCase();
+ const has=(...k)=>k.some(x=>m.includes(x));
+ let out=null,done=false;
+
+ if(vctx==='slots'){
+  if(has('samedi','9','neuf')){out="Parfait, c'est réservé : samedi neuf heures, contrôle avec la doctoresse Favre. Vous recevrez un SMS de confirmation. À samedi !";done=true;vctx=null;}
+  else if(has('jeudi','17','dix-sept')){out="Très bien : jeudi dix-sept heures trente, c'est noté. SMS de confirmation envoyé. À jeudi !";done=true;vctx=null;}
+  else{out="J'ai jeudi dix-sept heures trente, ou samedi neuf heures. Vous préférez lequel ?";}}
+ else if(vctx==='triage'){vctx=null;
+  if(has('non','pas de')){vctx='urgslot';out="D'accord. Nous gardons des créneaux d'urgence chaque jour : le prochain est aujourd'hui à dix-sept heures quinze. Je vous le réserve ?";}
+  else{out="Ces signes demandent une prise en charge immédiate : appelez le cabinet dès l'ouverture au zéro vingt-et-un, ou le cent quarante-quatre en cas de détresse. Je préviens l'équipe.";done=true;}}
+ else if(vctx==='urgslot'){vctx=null;
+  if(has('oui','d\'accord','ok','volontiers')){out="C'est réservé : aujourd'hui dix-sept heures quinze, urgence douleur. Évitez le chaud et le froid sur la dent d'ici là. Bon courage, à tout à l'heure !";done=true;}
+  else{out="Très bien. Si la douleur augmente, rappelez-moi, je vous ferai passer en priorité. Autre chose ?";}}
+ else if(vctx==='cxl'){vctx=null;
+  if(has('oui','report','autre','mardi')){out="C'est fait : votre rendez-vous est reporté à mardi quinze heures, sans frais. SMS de confirmation envoyé. Bonne journée !";done=true;}
+  else{out="C'est noté, votre rendez-vous est annulé. Le créneau est proposé à la liste d'attente. Bonne journée !";done=true;}}
+ else if(/\bmal\b|douleur|rage de dent|urgence/.test(m)){vctx='triage';
+  out="Je suis désolé pour cette douleur. Une question importante : avez-vous le visage gonflé, de la fièvre, ou du mal à avaler ?";}
+ else if(has('annuler','annulation','déplacer','reporter')){vctx='cxl';
+  out="Bien sûr. Plutôt qu'annuler, je peux vous proposer un report sans frais, par exemple mardi quinze heures. Ça vous conviendrait ?";}
+ else if(has('rendez-vous','rendez vous','contrôle','controle','détartrage','detartrage','hygiène','rdv')){vctx='slots';
+  out="Avec plaisir. Pour un contrôle, j'ai jeudi dix-sept heures trente ou samedi neuf heures. Lequel vous arrange ?";}
+ else if(has('tarif','prix','coûte','rembours','lamal')){
+  out="L'assurance de base ne couvre pas les soins courants ; un contrôle avec détartrage débute vers cent quatre-vingts francs, et un devis est toujours établi avant tout traitement. Souhaitez-vous un rendez-vous ?";}
+ else if(has('horaire','ouvert','adresse')){
+  out="Le cabinet est ouvert du lundi au vendredi, de huit heures à dix-huit heures, rue du Lac douze à Lausanne. Et moi je réponds vingt-quatre heures sur vingt-quatre. Je peux vous aider pour autre chose ?";}
+ else if(has('bonjour','allô','allo','salut')){
+  out="Bonjour ! Cabinet dentaire du Léman. Que puis-je faire pour vous : un rendez-vous, une annulation, ou une urgence ?";}
+ else if(has('merci','au revoir','c\'est tout','rien')){
+  out="Merci de votre appel, excellente journée, au revoir !";done=true;}
+ else{out="J'ai bien noté. Je peux prendre un rendez-vous, gérer une annulation, ou traiter une urgence douloureuse. Que souhaitez-vous ?";}
+
+ speak(out,done?()=>setTimeout(hangup,900):listen);
+}
+
+function startCall(){if(inCall)return;inCall=true;vctx=null;
+ ltrans.innerHTML='';callbtn.style.display='none';hangbtn.style.display='inline-block';
+ callSec=0;ldur.textContent='00:00';
+ callTimer=setInterval(()=>{callSec++;ldur.textContent=`${String(Math.floor(callSec/60)).padStart(2,'0')}:${String(callSec%60).padStart(2,'0')}`;},1000);
+ lline('s','📞 Sonnerie… l\'agent décroche (2e sonnerie)');
+ setTimeout(()=>{if(!inCall)return;
+  speak("Cabinet dentaire du Léman, bonjour ! Je suis l'assistant vocal du cabinet. Que puis-je faire pour vous ?",listen);},1400);}
+
+function hangup(){if(!inCall)return;inCall=false;
+ if(rec){try{rec.abort();}catch(e){}}
+ speechSynthesis.cancel();clearInterval(callTimer);
+ lline('s','🔴 Appel terminé — en production : résumé de l\'appel + action agenda journalisés (nLPD)');
+ lstate.textContent='Appel terminé';lav.textContent='📞';
+ callbtn.style.display='inline-block';hangbtn.style.display='none';fallbar.style.display='none';}
+
+callbtn.onclick=startCall;
+hangbtn.onclick=hangup;
+</script>
+</body>
+</html>
