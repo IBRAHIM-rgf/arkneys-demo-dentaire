@@ -130,6 +130,7 @@ footer b{color:var(--text)}
     <button class="tab" data-p="m2">💬 Rappels SMS</button>
     <button class="tab" data-p="m3">🔄 Réactivation</button>
     <button class="tab" data-p="m4">🚨 Tri d'urgence</button>
+    <button class="tab" data-p="m5">📋 Préparation consult.</button>
     <button class="tab" data-p="live">🎙️ Appel live</button>
   </nav>
 
@@ -146,6 +147,7 @@ footer b{color:var(--text)}
       <button class="mod" data-go="m2"><div class="mi">💬</div><div class="mn">Module 2 · Rappels & confirmations SMS</div><div class="md">Confirmation automatique des RDV, relance des patients non confirmés. Réduit les no-shows de 50 à 70%.</div><span class="mb">Voir la séquence →</span></button>
       <button class="mod" data-go="m3"><div class="mi">🔄</div><div class="mn">Module 3 · Réactivation patients</div><div class="md">Recontacte les patients sans contrôle depuis 12 mois. Le module qui génère du chiffre visible et justifie l'abonnement.</div><span class="mb">Lancer la campagne →</span></button>
       <button class="mod" data-go="m4"><div class="mi">🚨</div><div class="mn">Module 4 · Tri d'urgence <small>OPTION</small></div><div class="md">Qualifie la douleur (aiguë / modérée) et attribue un créneau prioritaire — sans jamais poser de diagnostic.</div><span class="mb">Simuler un appel urgent →</span></button>
+      <button class="mod" data-go="m5"><div class="mi">📋</div><div class="mn">Module 5 · Préparation de consultation <small>OPTION</small></div><div class="md">Contacte le patient par SMS/WhatsApp 24-48h avant le RDV, recueille motif, traitements et allergies — et remet au praticien une synthèse de 6 lignes. Collecte sans jamais interpréter.</div><span class="mb">Vivre la conversation patient →</span></button>
     </div>
   </div>
 
@@ -209,6 +211,20 @@ footer b{color:var(--text)}
     <div class="urgcard urg-m" id="card-m"><b>🟡 Qualification : douleur MODÉRÉE</b>Rendez-vous sous 48h proposé : jeudi 9h40. SMS de confirmation envoyé avec consignes d'attente. Si aggravation (gonflement, fièvre) : rappeler immédiatement — l'agent re-priorisera.</div>
   </div>
 
+  <!-- ============ MODULE 5 : PRÉPARATION CONSULTATION ============ -->
+  <div class="panel" id="p-m5">
+    <div class="simhead"><h2>📋 Module 5 — Préparation de consultation (option)</h2>
+    <p>24 à 48h avant le rendez-vous, l'agent contacte le patient par SMS/WhatsApp et recueille l'essentiel. <b>Il collecte, il n'interprète jamais</b> — et remet au praticien une synthèse de 6 lignes. Mets-toi dans la peau du patient : réponds ci-dessous (ou clique une suggestion).</p></div>
+    <div class="smsbox" id="prepbox" style="max-height:44vh;overflow-y:auto"></div>
+    <div class="scenrow" id="prepsuggest"></div>
+    <div style="display:flex;gap:8px;padding:4px 16px 8px">
+      <input id="prepin" type="text" placeholder="Répondez comme le patient…" style="flex:1;background:var(--chip);border:1px solid var(--border);border-radius:12px;padding:11px 14px;color:var(--text);font-size:13px;font-family:inherit;outline:none">
+      <button class="gen" id="prepsend" style="margin:0;padding:11px 16px">➤</button>
+    </div>
+    <div class="urgcard urg-m" id="prepsynth" style="display:none"></div>
+    <p class="note">Garde-fous : aucun commentaire médical (ni rassurant ni alarmant), signal d'urgence → 144 + notification cabinet, questions médicales notées pour le praticien, chaque question est facultative.</p>
+  </div>
+
   <!-- ============ APPEL LIVE ============ -->
   <div class="panel" id="p-live">
     <div class="simhead"><h2>🎙️ Appel live — parlez à l'agent</h2>
@@ -247,7 +263,8 @@ footer b{color:var(--text)}
 /* ===== nav ===== */
 const tabs=document.querySelectorAll('.tab'),panels=document.querySelectorAll('.panel');
 function goTab(n){tabs.forEach(x=>x.classList.remove('on'));panels.forEach(p=>p.classList.remove('on'));
- document.querySelector(`.tab[data-p="${n}"]`).classList.add('on');document.getElementById('p-'+n).classList.add('on');}
+ document.querySelector(`.tab[data-p="${n}"]`).classList.add('on');document.getElementById('p-'+n).classList.add('on');
+ if(n==='m5'&&typeof prepStart==='function'&&prepStep<0)prepStart();}
 tabs.forEach(t=>t.onclick=()=>goTab(t.dataset.p));
 document.querySelectorAll('.mod').forEach(m=>m.onclick=()=>goTab(m.dataset.go));
 document.getElementById('theme').onclick=e=>{document.body.classList.toggle('light');
@@ -382,6 +399,68 @@ document.querySelectorAll('#p-m4 .scen').forEach(b=>b.onclick=()=>{
  document.getElementById('card-a').classList.remove('show');document.getElementById('card-m').classList.remove('show');
  playScript(URG[b.dataset.u],document.getElementById('utrans'),document.getElementById('udur'),document.getElementById('ustate'));
  timers.push(setTimeout(()=>{document.getElementById('card-'+b.dataset.u).classList.add('show');},URG[b.dataset.u].length*1600+1200));});
+
+/* ===================================================== */
+/* ==== MODULE 5 : PRÉPARATION DE CONSULTATION ========= */
+/* ===================================================== */
+const PREPQ=[
+ "Bonjour, ici l'assistant du Cabinet dentaire du Léman 👋 Votre rendez-vous avec la Dre Favre est jeudi à 14h30. Pour préparer au mieux la consultation, cinq petites questions — toutes facultatives. Quel est le motif principal de votre consultation, en une phrase ?",
+ "Merci. Depuis combien de temps cela dure-t-il ?",
+ "Prenez-vous actuellement des médicaments ? Si oui, lesquels ?",
+ "Avez-vous des allergies connues ?",
+ "Dernière question : y a-t-il autre chose que la Dre Favre devrait savoir ?"];
+const PREPSUG=[
+ ["Douleur en mâchant, côté droit","Contrôle de routine","😰 J'ai une douleur dans la poitrine"],
+ ["Environ deux semaines","Depuis hier","C'est grave docteur ?"],
+ ["Ibuprofène de temps en temps","Aucun médicament","Je préfère ne pas répondre"],
+ ["Pénicilline","Aucune allergie connue",""],
+ ["J'ai un peu peur des piqûres","Non, rien d'autre",""]];
+const prepbox=document.getElementById('prepbox'),prepin=document.getElementById('prepin'),
+      prepsug=document.getElementById('prepsuggest'),prepsynth=document.getElementById('prepsynth');
+let prepStep=-1,prepAns=[],prepQuestions=[],prepDone=false;
+
+function prepMsg(w,t){const d=document.createElement('div');
+ if(w==='s'){d.className='ls';d.style.alignSelf='center';d.textContent=t;}
+ else{d.className='sms '+(w==='out'?'sout':'sin');d.textContent=t;}
+ prepbox.appendChild(d);prepbox.scrollTop=prepbox.scrollHeight;}
+function prepSuggest(){prepsug.innerHTML='';if(prepStep<0||prepStep>=PREPQ.length||prepDone)return;
+ PREPSUG[prepStep].filter(s=>s).forEach(s=>{const b=document.createElement('button');b.className='scen';
+  b.textContent=s;b.onclick=()=>{prepin.value=s;prepSend();};prepsug.appendChild(b);});}
+function prepAsk(){if(prepStep<PREPQ.length){setTimeout(()=>{prepMsg('out',PREPQ[prepStep]);prepSuggest();},700);}
+ else prepFinish();}
+function prepStart(){prepbox.innerHTML='';prepsynth.style.display='none';prepAns=[];prepQuestions=[];prepDone=false;
+ prepMsg('s','📱 J-2 avant le RDV — SMS envoyé automatiquement au patient (simulation)');
+ prepStep=0;prepAsk();}
+function prepFinish(){prepDone=true;prepsug.innerHTML='';
+ setTimeout(()=>{prepMsg('out',"Merci beaucoup, tout est transmis à la Dre Favre. À jeudi 14h30 — pensez à votre carte d'assurance. Belle journée !");
+  prepMsg('s','✅ Synthèse générée et déposée dans le dossier patient — visible uniquement par l\'équipe');
+  const lab=['Motif','Durée','Traitements énoncés','Allergies','Remarques'];
+  let lines=lab.map((l,i)=>`<b>${l} :</b> ${prepAns[i]?('« '+prepAns[i]+' »'):'—'}`);
+  lines.push('<b>Questions du patient :</b> '+(prepQuestions.length?prepQuestions.map(q=>'« '+q+' »').join(' · '):'aucune'));
+  prepsynth.innerHTML='<b>📋 Synthèse pour la Dre Favre (générée par l\'agent)</b>'+lines.join('<br>');
+  prepsynth.style.display='block';prepsynth.className='urgcard urg-m show';},900);}
+function prepSend(){const t=prepin.value.trim();if(!t||prepDone||prepStep<0)return;prepin.value='';
+ prepMsg('in',t);const m=t.toLowerCase();
+ // urgence vitale
+ if(/poitrine|thoraci|respirer|respiration|parole|paralys|motricité|suicid/.test(m)){prepDone=true;prepsug.innerHTML='';
+  setTimeout(()=>{prepMsg('out',"Ce que vous décrivez ne doit pas attendre votre rendez-vous. Composez le 144 maintenant.");
+   prepMsg('s','🚨 Notification immédiate envoyée au cabinet — conversation close');},600);return;}
+ // refus de continuer
+ if(/préfère ne pas|prefere ne pas|ne veux pas|stop|arrêtez|arretez/.test(m)){
+  prepAns[prepStep]=null;prepStep++;
+  if(/stop|arrêtez|arretez/.test(m)){prepDone=true;prepsug.innerHTML='';
+   setTimeout(()=>{prepMsg('out',"Aucun souci, merci pour votre temps. À jeudi 14h30 !");
+    prepMsg('s','✅ Synthèse partielle transmise à la Dre Favre');},600);return;}
+  setTimeout(()=>{prepMsg('out',"Bien sûr, aucune obligation.");prepAsk();},600);return;}
+ // question médicale du patient
+ if(/\?$/.test(t)||/est-ce que c'est|c'est grave|dois-je m'inquiéter|qu'est-ce que j'ai/.test(m)){
+  prepQuestions.push(t);
+  setTimeout(()=>{prepMsg('out',"La Dre Favre y répondra en consultation, je la note pour elle. "+(prepStep<PREPQ.length?"Reprenons :":""));
+   prepAsk();},600);return;}
+ // réponse normale
+ prepAns[prepStep]=t;prepStep++;prepAsk();}
+document.getElementById('prepsend').onclick=prepSend;
+prepin.addEventListener('keydown',e=>{if(e.key==='Enter')prepSend();});
 
 /* ===================================================== */
 /* ============ APPEL LIVE (voix réelle) =============== */
