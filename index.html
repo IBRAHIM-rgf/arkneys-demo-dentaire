@@ -27,6 +27,8 @@ header{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:
 .hbtn{background:var(--chip);border:1px solid var(--border);color:var(--text);border-radius:11px;padding:8px 10px;cursor:pointer;font-size:13px;font-family:inherit}
 nav{display:flex;flex-wrap:wrap;gap:7px;padding:12px 14px;justify-content:center;border-bottom:1px solid var(--border);background:var(--bg2)}
 .tab{background:transparent;border:1px solid transparent;color:var(--mid);border-radius:999px;padding:8px 12px;cursor:pointer;font-size:12.5px;font-weight:600;font-family:inherit}
+a.tab,a.mod{text-decoration:none;color:var(--mid);display:inline-block}
+a.mod{color:inherit}
 .tab:hover{color:var(--text)}
 .tab.on{border-color:var(--teal);color:var(--text);background:rgba(45,212,191,.08)}
 .panel{display:none;flex:1;flex-direction:column;padding-bottom:20px}
@@ -132,6 +134,7 @@ footer b{color:var(--text)}
     <button class="tab" data-p="m4">🚨 Tri d'urgence</button>
     <button class="tab" data-p="m5">📋 Préparation consult.</button>
     <button class="tab" data-p="live">🎙️ Appel live</button>
+    <a class="tab" href="dashboard" target="_blank" rel="noopener">📊 Dashboard cabinet ↗</a>
   </nav>
 
   <!-- ============ ACCUEIL ============ -->
@@ -148,6 +151,7 @@ footer b{color:var(--text)}
       <button class="mod" data-go="m3"><div class="mi">🔄</div><div class="mn">Module 3 · Réactivation patients</div><div class="md">Recontacte les patients sans contrôle depuis 12 mois. Le module qui génère du chiffre visible et justifie l'abonnement.</div><span class="mb">Lancer la campagne →</span></button>
       <button class="mod" data-go="m4"><div class="mi">🚨</div><div class="mn">Module 4 · Tri d'urgence <small>OPTION</small></div><div class="md">Qualifie la douleur (aiguë / modérée) et attribue un créneau prioritaire — sans jamais poser de diagnostic.</div><span class="mb">Simuler un appel urgent →</span></button>
       <button class="mod" data-go="m5"><div class="mi">📋</div><div class="mn">Module 5 · Préparation de consultation <small>OPTION</small></div><div class="md">Contacte le patient par SMS/WhatsApp 24-48h avant le RDV, recueille motif, traitements et allergies — et remet au praticien une synthèse de 6 lignes. Collecte sans jamais interpréter.</div><span class="mb">Vivre la conversation patient →</span></button>
+      <a class="mod" href="dashboard" target="_blank" rel="noopener"><div class="mi">📊</div><div class="mn">Dashboard cabinet · la preuve chiffrée</div><div class="md">Valeur générée en francs, appels hors horaires captés, no-shows évités, patients réactivés — le rapport mensuel que reçoit le cabinet.</div><span class="mb">Ouvrir le dashboard ↗</span></a>
     </div>
   </div>
 
@@ -265,8 +269,8 @@ const tabs=document.querySelectorAll('.tab'),panels=document.querySelectorAll('.
 function goTab(n){tabs.forEach(x=>x.classList.remove('on'));panels.forEach(p=>p.classList.remove('on'));
  document.querySelector(`.tab[data-p="${n}"]`).classList.add('on');document.getElementById('p-'+n).classList.add('on');
  if(n==='m5'&&typeof prepStart==='function'&&prepStep<0)prepStart();}
-tabs.forEach(t=>t.onclick=()=>goTab(t.dataset.p));
-document.querySelectorAll('.mod').forEach(m=>m.onclick=()=>goTab(m.dataset.go));
+tabs.forEach(t=>{if(t.dataset.p)t.onclick=()=>goTab(t.dataset.p);});
+document.querySelectorAll('.mod').forEach(m=>{if(m.dataset.go)m.onclick=()=>goTab(m.dataset.go);});
 document.getElementById('theme').onclick=e=>{document.body.classList.toggle('light');
  e.target.textContent=document.body.classList.contains('light')?'🌙':'☀️';};
 
